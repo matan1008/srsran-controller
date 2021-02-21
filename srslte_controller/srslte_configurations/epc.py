@@ -1,6 +1,5 @@
 import configparser
 from dataclasses import dataclass, field, asdict
-
 from typing import TextIO
 
 
@@ -56,13 +55,11 @@ class SrsEpcLogConfiguration:
         if not self.all_level:
             del log['all_level']
         else:
-            del log['nas_level']
-            del log['s1ap_level']
-            del log['mme_gtpc_level']
-            del log['spgw_gtpc_level']
-            del log['gtpu_level']
-            del log['spgw_level']
-            del log['hss_level']
+            for entry in (
+                    'nas_level', 's1ap_level', 'mme_gtpc_level', 'spgw_gtpc_level', 'gtpu_level', 'spgw_level',
+                    'hss_level',
+            ):
+                del log[entry]
         return log
 
 
