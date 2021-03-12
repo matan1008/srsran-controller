@@ -26,7 +26,7 @@ class SrsEpcHssConfiguration:
 @dataclass
 class SrsEpcSpgwConfiguration:
     gtpu_bind_addr: str
-    sgi_if_addr: str
+    sgi_if_addr: str = '172.16.0.1'
     sgi_if_name: str = 'srs_spgw_sgi'
     max_paging_queue: int = 100
 
