@@ -1,6 +1,6 @@
 import docker
 
-import srslte_controller.configuration as config
+from srslte_controller.configuration import config
 from srslte_controller.mission.entity import Entity
 
 
