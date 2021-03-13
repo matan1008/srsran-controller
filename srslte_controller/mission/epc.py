@@ -19,6 +19,8 @@ class Epc(Entity):
         :param hss_db: SrsEPC users DB (HSS configuration) path.
         :param network_id: Docker network to attach to.
         :param ip: Container IP inside the network.
+        :return: Epc object.
+        :rtype: Epc
         """
         client = docker.from_env()
         volumes = {
