@@ -16,7 +16,7 @@ class SrsEnbSib1:
     q_rx_lev_min: int
     cell_barred: str
     si_window_length: int
-    sched_info: tuple[SrsEnbSib1SchedulerInfo]
+    sched_info: tuple[SrsEnbSib1SchedulerInfo, ...]
     system_info_value_tag: int
 
 
@@ -181,13 +181,13 @@ class SrsEnbSib7CarrierFreqsInfo:
     thresh_x_low: int
     start_arfcn: int
     band_ind: str
-    explicit_list_of_arfcns: tuple[int]
+    explicit_list_of_arfcns: tuple[int, ...]
 
 
 @dataclass
 class SrsEnbSib7:
     t_resel_geran: int
-    carrier_freqs_info_list: tuple[SrsEnbSib7CarrierFreqsInfo]
+    carrier_freqs_info_list: tuple[SrsEnbSib7CarrierFreqsInfo, ...]
 
 
 @dataclass
