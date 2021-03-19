@@ -7,7 +7,7 @@ def test_sanity():
     output = StringIO()
     SrsEpcConfiguration(
         mme=SrsEpcMmeConfiguration(
-            mme_code='0x1a', mme_group='0x0001', tac='0x0007', mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
+            mme_code='0x1a', mme_group='0x0001', tac=0x0007, mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
             apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2
         ),
         hss=SrsEpcHssConfiguration(db_file='user_db.csv'),
@@ -24,7 +24,7 @@ def test_sanity():
         '[mme]\n'
         'mme_code = 0x1a\n'
         'mme_group = 0x0001\n'
-        'tac = 0x0007\n'
+        'tac = 7\n'
         'mcc = 001\n'
         'mnc = 01\n'
         'mme_bind_addr = 127.0.1.100\n'
@@ -65,7 +65,7 @@ def test_log_all():
     output = StringIO()
     SrsEpcConfiguration(
         mme=SrsEpcMmeConfiguration(
-            mme_code='0x1a', mme_group='0x0001', tac='0x0007', mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
+            mme_code='0x1a', mme_group='0x0001', tac=0x0007, mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
             apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2
         ),
         hss=SrsEpcHssConfiguration(db_file='user_db.csv'),
@@ -79,7 +79,7 @@ def test_log_all():
         '[mme]\n'
         'mme_code = 0x1a\n'
         'mme_group = 0x0001\n'
-        'tac = 0x0007\n'
+        'tac = 7\n'
         'mcc = 001\n'
         'mnc = 01\n'
         'mme_bind_addr = 127.0.1.100\n'

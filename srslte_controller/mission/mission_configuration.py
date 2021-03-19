@@ -9,5 +9,5 @@ class MissionConfiguration:
     mnc: str = '01'
     mme_code: str = '0x1a'
     mme_group: str = '0x0001'
-    tac: str = '0x0007'
+    tac: int = 0x0007
     apn: str = 'internet'

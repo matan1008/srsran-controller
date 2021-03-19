@@ -7,7 +7,7 @@ from typing import TextIO
 class SrsEpcMmeConfiguration:
     mme_code: str
     mme_group: str
-    tac: str
+    tac: int
     mcc: str
     mnc: str
     mme_bind_addr: str
