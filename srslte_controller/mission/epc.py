@@ -6,9 +6,9 @@ from srslte_controller.mission.entity import Entity
 
 class Epc(Entity):
     CONTAINER_NAME = 'epc'
-    EPC_CONF_CONTAINER_PATH = '/mnt/epc.conf'
-    EPC_HSS_CONFIGURATION_PATH = '/mnt/user_db.csv'
-    EPC_COMMAND = f'srsepc {EPC_CONF_CONTAINER_PATH}'
+    CONF_CONTAINER_PATH = '/mnt/epc.conf'
+    HSS_CONFIGURATION_PATH = '/mnt/user_db.csv'
+    COMMAND = f'srsepc {CONF_CONTAINER_PATH}'
     TUN_CONTROL_PATH = '/dev/net/tun'
 
     @staticmethod
@@ -24,12 +24,12 @@ class Epc(Entity):
         """
         client = docker.from_env()
         volumes = {
-            configuration_path: {'bind': Epc.EPC_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            hss_db: {'bind': Epc.EPC_HSS_CONFIGURATION_PATH, 'mode': 'ro'},
+            configuration_path: {'bind': Epc.CONF_CONTAINER_PATH, 'mode': 'ro'},
+            hss_db: {'bind': Epc.HSS_CONFIGURATION_PATH, 'mode': 'ro'},
             Epc.TUN_CONTROL_PATH: {'bind': Epc.TUN_CONTROL_PATH, 'mode': 'rw'},  # Allow creating TUN devices.
         }
         container = client.containers.create(
-            config.epc_docker_image, Epc.EPC_COMMAND, volumes=volumes, cap_add=['NET_ADMIN'], auto_remove=True,
+            config.epc_docker_image, Epc.COMMAND, volumes=volumes, cap_add=['NET_ADMIN'], auto_remove=True,
             name=Epc.CONTAINER_NAME, network_mode='none'
         )
         epc = Epc(container)
