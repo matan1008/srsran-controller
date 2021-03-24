@@ -26,6 +26,8 @@ class Enb(Entity):
         :param network_id: Docker network to attach to.
         :param ip: Container IP inside the network.
         """
+        # The previous CAP file is irrelevant.
+        os.remove(config.current_enb_cap)
         client = docker.from_env()
         volumes = {
             configuration_path: {'bind': Enb.CONF_CONTAINER_PATH, 'mode': 'ro'},
