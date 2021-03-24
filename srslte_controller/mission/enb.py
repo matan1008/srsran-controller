@@ -8,12 +8,12 @@ from srslte_controller.mission.entity import Entity
 
 class Enb(Entity):
     CONTAINER_NAME = 'enb'
-    ENB_CONF_CONTAINER_PATH = '/mnt/enb.conf'
-    ENB_SIBS_CONF_CONTAINER_PATH = '/mnt/enb_sibs.conf'
-    ENB_DRBS_CONF_CONTAINER_PATH = '/mnt/enb_drbs.conf'
-    ENB_RR_CONF_CONTAINER_PATH = '/mnt/enb_rr.conf'
+    CONF_CONTAINER_PATH = '/mnt/enb.conf'
+    SIBS_CONF_CONTAINER_PATH = '/mnt/enb_sibs.conf'
+    DRBS_CONF_CONTAINER_PATH = '/mnt/enb_drbs.conf'
+    RR_CONF_CONTAINER_PATH = '/mnt/enb_rr.conf'
     CAP_CONTAINER_PATH = '/tmp/enb.pcap'
-    ENB_COMMAND = f'srsenb {ENB_CONF_CONTAINER_PATH}'
+    COMMAND = f'srsenb {CONF_CONTAINER_PATH}'
 
     @staticmethod
     def create(configuration_path: str, sibs_path: str, drbs_path: str, rr_path: str, network_id: str, ip: str):
@@ -28,14 +28,14 @@ class Enb(Entity):
         """
         client = docker.from_env()
         volumes = {
-            configuration_path: {'bind': Enb.ENB_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            sibs_path: {'bind': Enb.ENB_SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            drbs_path: {'bind': Enb.ENB_DRBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            rr_path: {'bind': Enb.ENB_RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
+            configuration_path: {'bind': Enb.CONF_CONTAINER_PATH, 'mode': 'ro'},
+            sibs_path: {'bind': Enb.SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
+            drbs_path: {'bind': Enb.DRBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
+            rr_path: {'bind': Enb.RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
             os.path.dirname(config.current_enb_cap): {'bind': os.path.dirname(Enb.CAP_CONTAINER_PATH), 'mode': 'rw'},
         }
         container = client.containers.create(
-            config.enb_docker_image, Enb.ENB_COMMAND, detach=True, volumes=volumes, auto_remove=True,
+            config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,
             name=Enb.CONTAINER_NAME, network_mode='none'
         )
         enb = Enb(container)
