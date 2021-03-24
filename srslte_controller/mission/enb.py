@@ -1,3 +1,5 @@
+import os
+
 import docker
 
 from srslte_controller.configuration import config
@@ -10,6 +12,7 @@ class Enb(Entity):
     ENB_SIBS_CONF_CONTAINER_PATH = '/mnt/enb_sibs.conf'
     ENB_DRBS_CONF_CONTAINER_PATH = '/mnt/enb_drbs.conf'
     ENB_RR_CONF_CONTAINER_PATH = '/mnt/enb_rr.conf'
+    CAP_CONTAINER_PATH = '/tmp/enb.pcap'
     ENB_COMMAND = f'srsenb {ENB_CONF_CONTAINER_PATH}'
 
     @staticmethod
@@ -29,6 +32,7 @@ class Enb(Entity):
             sibs_path: {'bind': Enb.ENB_SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             drbs_path: {'bind': Enb.ENB_DRBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rr_path: {'bind': Enb.ENB_RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
+            os.path.dirname(config.current_enb_cap): {'bind': os.path.dirname(Enb.CAP_CONTAINER_PATH), 'mode': 'rw'},
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.ENB_COMMAND, detach=True, volumes=volumes, auto_remove=True,
