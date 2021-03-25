@@ -5,8 +5,7 @@ from docker.errors import APIError
 class Entity:
     def __init__(self, container):
         """
-        Docker container to wrap.
-        :param docker.models.containers.Container container:
+        :param docker.models.containers.Container container: Docker container to wrap.
         """
         self._container = container
 
