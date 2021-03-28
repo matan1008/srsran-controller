@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import TextIO
 
 import libconf
@@ -12,12 +12,17 @@ class SrsEnbSib1SchedulerInfo:
 
 @dataclass
 class SrsEnbSib1:
-    intra_freq_reselection: str
-    q_rx_lev_min: int
-    cell_barred: str
-    si_window_length: int
-    sched_info: tuple[SrsEnbSib1SchedulerInfo, ...]
-    system_info_value_tag: int
+    # When cell status "barred" is indicated, allow the UE to select another cell on the same frequency.
+    intra_freq_reselection: str = 'Allowed'
+    q_rx_lev_min: int = -70  # The lowest minimum available, equals to -140dB.
+    # All UEs shall treat this cell as candidate during the cell selection and cell re-selection procedures.
+    cell_barred: str = 'NotBarred'
+    si_window_length: int = 20  # In ms.
+    # By default, transmit only SIB2, SIB3 and SIB7.
+    sched_info: tuple[SrsEnbSib1SchedulerInfo, ...] = field(
+        default_factory=lambda: (SrsEnbSib1SchedulerInfo(si_periodicity=16, si_mapping_info=[3, 7]),)
+    )
+    system_info_value_tag: int = 0  # Indicates if a change has occurred in the SI messages
 
 
 @dataclass
