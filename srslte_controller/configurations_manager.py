@@ -17,7 +17,9 @@ class ConfigurationsManager:
         return configuration
 
     def get_mission(self, mission_configuration_id):
-        return self._on_mission_configuration(mission_configuration_id, lambda f, data: MissionConfiguration(**data))
+        return self._on_mission_configuration(
+            mission_configuration_id, lambda f, data: MissionConfiguration.from_dict(data)
+        )
 
     def update_mission(self, configuration):
         def _update_callback(path, _data):

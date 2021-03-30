@@ -5,7 +5,7 @@ import pytest
 
 from srslte_controller.configurations_manager import ConfigurationsManager
 from srslte_controller.exceptions import MissionIdNotFoundError
-from srslte_controller.mission.mission_configuration import MissionConfiguration
+from srslte_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor
 
 
 def test_create_mission(tmpdir):
@@ -64,3 +64,12 @@ def test_delete_mission_error(tmpdir):
     configuration_manager = ConfigurationsManager(tmpdir)
     with pytest.raises(MissionIdNotFoundError):
         assert configuration_manager.delete_mission('mission_that_doesnt_exist')
+
+
+def test_mission_with_gsm_neighbor(tmpdir):
+    configuration_manager = ConfigurationsManager(tmpdir)
+    conf = configuration_manager.create_mission()
+    conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
+    configuration_manager.update_mission(conf)
+    assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].arfcn == conf.gsm_neighbors[0].arfcn
+    assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].band == conf.gsm_neighbors[0].band
