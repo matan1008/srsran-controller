@@ -27,13 +27,15 @@ class SrsEnbSib1:
 
 @dataclass
 class SrsEnbSib2RrRach:
-    num_ra_preambles: int
-    preamble_init_rx_target_pwr: int
-    pwr_ramping_step: int
-    preamble_trans_max: int
-    ra_resp_win_size: int
-    mac_con_res_timer: int
-    max_harq_msg3_tx: int
+    num_ra_preambles: int = 64  # the highest number available for non-dedicated random access preambles.
+    preamble_init_rx_target_pwr: int = -90  # The highest power for transmission of the initial preamble, in dBm.
+    pwr_ramping_step: int = 6  # The biggest increase for PRACH retransmissions, in dB.
+    preamble_trans_max: int = 200  # The maximum access attempts per UE.
+    ra_resp_win_size: int = 10  # The longest timer to wait for RA response after RA preamble, in subframes.
+    # The longest timer to wait for Contention Resolution message after sending Msg3, in subframes.
+    mac_con_res_timer: int = 64
+    # Higher value causes higher success rate of transmitting Msg3 and higher delay for retransmitting preambles.
+    max_harq_msg3_tx: int = 4
 
 
 @dataclass
