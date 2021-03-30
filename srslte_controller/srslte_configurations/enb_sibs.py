@@ -40,7 +40,7 @@ class SrsEnbSib2RrRach:
 
 @dataclass
 class SrsEnbSib2RrBcch:
-    modification_period_coeff: int
+    modification_period_coeff: int = 2  # Make the modification period as small as possible.
 
 
 @dataclass
