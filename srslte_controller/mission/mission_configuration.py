@@ -18,6 +18,12 @@ class MissionConfiguration:
     tac: int = 0x0007
     apn: str = 'internet'
     gsm_neighbors: list[GsmNeighbor] = field(default_factory=list)
+    cell_id: int = 0x01
+    pci = 1
+    earfcn = 3350
+    device_name: str = 'zmq'
+    device_args: str = ''
+    enb_id: int = 0x19B
 
     @staticmethod
     def from_dict(data: dict):
