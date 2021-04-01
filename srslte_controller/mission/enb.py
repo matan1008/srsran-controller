@@ -14,6 +14,7 @@ class Enb(Entity):
     RR_CONF_CONTAINER_PATH = '/mnt/enb_rr.conf'
     CAP_CONTAINER_PATH = '/tmp/enb.pcap'
     COMMAND = f'srsenb {CONF_CONTAINER_PATH}'
+    LOG_CONTAINER_PATH = '/tmp/enb.log'
 
     @staticmethod
     def create(configuration_path: str, sibs_path: str, drbs_path: str, rr_path: str, network_id: str, ip: str):
