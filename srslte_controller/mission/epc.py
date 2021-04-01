@@ -10,6 +10,8 @@ class Epc(Entity):
     HSS_CONFIGURATION_PATH = '/mnt/user_db.csv'
     COMMAND = f'srsepc {CONF_CONTAINER_PATH}'
     TUN_CONTROL_PATH = '/dev/net/tun'
+    LOG_CONTAINER_PATH = '/tmp/epc.log'
+    CAP_CONTAINER_PATH = '/tmp/epc.pcap'
 
     @staticmethod
     def create(configuration_path: str, hss_db: str, network_id: str, ip: str):
