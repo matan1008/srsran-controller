@@ -25,6 +25,6 @@ class SrslteController:
 
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
 
-    def stop_mission(self):
-        self.current_mission.stop()
+    async def stop_mission(self):
+        await self.current_mission.stop()
         self._current_mission = None
