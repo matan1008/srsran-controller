@@ -4,6 +4,9 @@ from dataclasses import dataclass, fields
 
 @dataclass
 class Configuration:
+    """
+    Global scoped configuration.
+    """
     missions_configurations_folder: str
     current_epc_configuration: str
     current_enb_configuration: str
@@ -15,7 +18,11 @@ class Configuration:
     epc_docker_image: str = 'srslte-controller-docker:latest'
     enb_docker_image: str = 'srslte-controller-docker:latest'
 
-    def reload(self, path):
+    def reload(self, path: str):
+        """
+        Update configuration values from a json file.
+        :param path: Path to a json configuration.
+        """
         with open(path, 'r') as fd:
             data = json.load(fd)
         for field in fields(self):
