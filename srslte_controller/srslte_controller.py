@@ -16,15 +16,28 @@ class SrslteController:
     def current_mission(self) -> Mission:
         return self._current_mission
 
-    def is_mission_up(self):
+    def is_mission_up(self) -> bool:
+        """
+        :return: True if a mission is running, False otherwise.
+        """
         return self.current_mission is not None
 
-    async def launch_mission(self, mission_configuration_id):
+    async def launch_mission(self, mission_configuration_id: str) -> Mission:
+        """
+        Launch a mission.
+        :param mission_configuration_id: Mission configuration id.
+        :return: Launched mission object.
+        :raises exceptions.MissionAlreadyRunningError: When trying to launch a mission while another mission is running.
+        """
         if self.is_mission_up():
             raise exceptions.MissionAlreadyRunningError()
 
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
+        return self._current_mission
 
     async def stop_mission(self):
+        """
+        Stop the running mission.
+        """
         await self.current_mission.stop()
         self._current_mission = None
