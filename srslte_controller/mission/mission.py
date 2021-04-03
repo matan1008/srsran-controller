@@ -15,7 +15,8 @@ class Mission:
         :param srslte_controller.mission.lte_network.LteNetwork network: Mission's network.
         """
         self.uu_events = []
-        self._events_factory = EventsFactory(self.uu_events.append)
+        self.uu_events_callback = lambda event: None
+        self._events_factory = EventsFactory(self._handle_uu_event)
         self._sniffer = UuSniffer(config.current_enb_cap, self._events_factory)
         self._sniffing_task = asyncio.create_task(self._sniffer.start())
         self.epc = epc
@@ -31,3 +32,7 @@ class Mission:
         self.enb.shutdown()
         self.epc.shutdown()
         self._network.shutdown()
+
+    def _handle_uu_event(self, event):
+        self.uu_events.append(event)
+        self.uu_events_callback(event)
