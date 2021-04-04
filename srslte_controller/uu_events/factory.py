@@ -1,20 +1,20 @@
 from datetime import datetime
 
+from srslte_controller.uu_events.nas_emm_attach_request import create as create_attach_request
+from srslte_controller.uu_events.random_access_response import create as create_ra_response
+
 
 class EventsFactory:
-    NAS_EMM_TYPE_ATTACH_REQUEST = 0x41
 
     def __init__(self, callback):
         self.callback = callback
+        self.events_creators = [
+            create_attach_request,
+            create_ra_response,
+        ]
 
     def from_packet(self, pkt):
-        try:
-            mac_layer = pkt['mac-lte']
-            if int(mac_layer.nas_eps_nas_msg_emm_type) == self.NAS_EMM_TYPE_ATTACH_REQUEST:
-                self.callback({
-                    'imsi': getattr(mac_layer, 'e212.imsi'),
-                    'event': 'Attach request',
-                    'time': datetime.fromtimestamp(float(pkt.frame_info.time_epoch))
-                })
-        except (KeyError, AttributeError):
-            pass
+        for creator in self.events_creators:
+            if (event := creator(pkt)) is not None:
+                event['time'] = datetime.fromtimestamp(float(pkt.frame_info.time_epoch))
+                self.callback(event)
