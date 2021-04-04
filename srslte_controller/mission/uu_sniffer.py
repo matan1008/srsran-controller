@@ -1,6 +1,5 @@
 import asyncio
 import os
-from contextlib import suppress
 
 import pyshark
 from pyshark.capture.capture import TSharkCrashException
@@ -42,12 +41,16 @@ class UuSniffer:
         """
         self._run = False
 
-    @staticmethod
-    async def _reload_cap(cap):
-        with suppress(TSharkCrashException):
-            # TShark might crash because the last packet might not be fully written, it will be read on the next reload.
-            cap.clear()
-            await cap.async_load_packets()
+    async def _reload_cap(self, cap):
+        # TShark might crash because the last packet might not be fully written, it will be read on the next reload.
+        while self._run:
+            try:
+                cap.clear()
+                await cap.async_load_packets()
+            except TSharkCrashException:
+                continue
+            else:
+                break
 
     def _publish_new_packets(self, cap):
         for i, packet in enumerate(cap):
