@@ -20,7 +20,7 @@ class SrsEnbRRMacConfigPhr:
 @dataclass
 class SrsEnbRRMacConfigUlsch:
     max_harq_tx: int = 28  # Higher value allows more HARQ retransmissions.
-    periodic_bsr_timer: int = 5  # Lower value yields more reports, in subframes.
+    periodic_bsr_timer: int = 64  # Lower value yields more reports, in subframes.
     retx_bsr_timer: int = 320  # Lower value yields more reports, in subframes.
 
 
