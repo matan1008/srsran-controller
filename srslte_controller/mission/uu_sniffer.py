@@ -1,8 +1,8 @@
 import asyncio
 import os
+import subprocess
 
 import pyshark
-from pyshark.capture.capture import TSharkCrashException
 
 
 class AsyncFileCapture(pyshark.FileCapture):
@@ -15,7 +15,7 @@ class AsyncFileCapture(pyshark.FileCapture):
 
 
 class UuSniffer:
-    READING_CHUNK = 20
+    FIXED_CAP_FILE = '/tmp/fixed_enb.pcap'
 
     def __init__(self, uu_cap, parser):
         self._cap_index = 0
@@ -27,19 +27,16 @@ class UuSniffer:
         """
         Start tracking the Uu capture file for new packets.
         """
-        while not os.path.exists(self._uu_cap):
+        while not os.path.exists(self._uu_cap) or not os.stat(self._uu_cap).st_size:
             await asyncio.sleep(0)
 
         # We use our own version of FileCapture since the original is not really async.
-        cap = AsyncFileCapture(self._uu_cap)
+        cap = AsyncFileCapture(self.FIXED_CAP_FILE)
         while self._run:
-            # TShark might crash because the last packet might not be fully written, it will be read on the next reload.
-            try:
-                await self._reload_cap(cap)
-                self._publish_new_packets(cap)
-                self._cap_index = len(cap)
-            except TSharkCrashException:
-                continue
+            await self._fix_pcap()
+            await self._reload_cap(cap)
+            self._publish_new_packets(cap)
+            self._cap_index = len(cap)
 
     def stop(self):
         """
@@ -47,10 +44,15 @@ class UuSniffer:
         """
         self._run = False
 
-    async def _reload_cap(self, cap):
+    @staticmethod
+    async def _reload_cap(cap):
         cap.clear()
-        # Read packets in chunks since PCAP file end might be corrupted.
-        await cap.async_load_packets(packet_count=self._cap_index + self.READING_CHUNK)
+        await cap.async_load_packets()
+
+    async def _fix_pcap(self):
+        await asyncio.create_subprocess_exec(
+            'pcapfix', self._uu_cap, '-o', self.FIXED_CAP_FILE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
 
     def _publish_new_packets(self, cap):
         for i, packet in enumerate(cap):
