@@ -17,7 +17,7 @@ ATTACH_REQUEST_PCAP_DATA = (
 )
 
 
-def test_parsing_random_access_response(tmp_path):
+def test_parsing_emm_attach_request(tmp_path):
     p = tmp_path / 'attach_request.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_REQUEST_PCAP_DATA))
     pcap = FileCapture(str(p))
