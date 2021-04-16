@@ -27,7 +27,7 @@ class UuSniffer:
         """
         Start tracking the Uu capture file for new packets.
         """
-        while not os.path.exists(self._uu_cap) or not os.stat(self._uu_cap).st_size:
+        while self._run and not self._uu_pcap_ready():
             await asyncio.sleep(0)
 
         # We use our own version of FileCapture since the original is not really async.
@@ -53,6 +53,9 @@ class UuSniffer:
         await asyncio.create_subprocess_exec(
             'pcapfix', self._uu_cap, '-o', self.FIXED_CAP_FILE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
+
+    def _uu_pcap_ready(self):
+        return os.path.exists(self._uu_cap) and os.stat(self._uu_cap).st_size
 
     def _publish_new_packets(self, cap):
         for i, packet in enumerate(cap):
