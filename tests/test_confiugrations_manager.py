@@ -73,3 +73,37 @@ def test_mission_with_gsm_neighbor(tmpdir):
     configuration_manager.update_mission(conf)
     assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].arfcn == conf.gsm_neighbors[0].arfcn
     assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].band == conf.gsm_neighbors[0].band
+
+
+def test_updating_all_configuration_values(tmpdir):
+    configuration_manager = ConfigurationsManager(tmpdir)
+    conf = configuration_manager.create_mission()
+    conf.mcc = '901'
+    conf.mnc = '01'
+    conf.mme_code = '0x1b'
+    conf.mme_group = '0x0002'
+    conf.tac = 9
+    conf.apn = 'inter'
+    conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
+    conf.cell_id = 3
+    conf.pci = 6
+    conf.earfcn = 1800
+    conf.device_name = 'auto'
+    conf.device_args = 'serial=33333333'
+    conf.enb_id = 0x19a
+    configuration_manager.update_mission(conf)
+    conf = configuration_manager.get_mission(conf.id)
+
+    assert conf.mcc == '901'
+    assert conf.mnc == '01'
+    assert conf.mme_code == '0x1b'
+    assert conf.mme_group == '0x0002'
+    assert conf.tac == 9
+    assert conf.apn == 'inter'
+    assert conf.gsm_neighbors == [GsmNeighbor(arfcn=871, band='dcs1800')]
+    assert conf.cell_id == 3
+    assert conf.pci == 6
+    assert conf.earfcn == 1800
+    assert conf.device_name == 'auto'
+    assert conf.device_args == 'serial=33333333'
+    assert conf.enb_id == 0x19a

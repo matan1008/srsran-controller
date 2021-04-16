@@ -19,8 +19,8 @@ class MissionConfiguration:
     apn: str = 'internet'
     gsm_neighbors: list[GsmNeighbor] = field(default_factory=list)
     cell_id: int = 0x01
-    pci = 1
-    earfcn = 3350
+    pci: int = 1
+    earfcn: int = 3350
     device_name: str = 'zmq'
     device_args: str = ''
     enb_id: int = 0x19B
