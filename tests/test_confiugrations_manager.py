@@ -5,7 +5,7 @@ import pytest
 
 from srslte_controller.configurations_manager import ConfigurationsManager
 from srslte_controller.exceptions import MissionIdNotFoundError
-from srslte_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor
+from srslte_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor, EnbCell
 
 
 def test_create_mission(tmpdir):
@@ -85,9 +85,7 @@ def test_updating_all_configuration_values(tmpdir):
     conf.tac = 9
     conf.apn = 'inter'
     conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
-    conf.cell_id = 3
-    conf.pci = 6
-    conf.earfcn = 1800
+    conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     conf.device_name = 'auto'
     conf.device_args = 'serial=33333333'
     conf.enb_id = 0x19a
@@ -101,9 +99,7 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.tac == 9
     assert conf.apn == 'inter'
     assert conf.gsm_neighbors == [GsmNeighbor(arfcn=871, band='dcs1800')]
-    assert conf.cell_id == 3
-    assert conf.pci == 6
-    assert conf.earfcn == 1800
+    assert conf.cells == [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     assert conf.device_name == 'auto'
     assert conf.device_args == 'serial=33333333'
     assert conf.enb_id == 0x19a

@@ -46,12 +46,17 @@ def build_drbs():
 
 
 def build_rr(conf):
+    """
+    :param srslte_controller.mission.mission_configuration.MissionConfiguration conf:
+    """
     return SrsEnbRR(
-        cell_list=(SrsEnbRRCell(
-            cell_id=conf.cell_id, tac=conf.tac, pci=conf.pci, dl_earfcn=conf.earfcn,
-            meas_cell_list=(SrsEnbRRCellListMeasCell(eci=(256 * conf.enb_id) + 0x01, dl_earfcn=3350, pci=1),),
+        cell_list=tuple(SrsEnbRRCell(
+            cell_id=cell.cell_id, tac=conf.tac, pci=cell.pci, dl_earfcn=cell.earfcn, rf_port=i,
+            meas_cell_list=(
+                SrsEnbRRCellListMeasCell(eci=(256 * conf.enb_id) + cell.cell_id, dl_earfcn=cell.earfcn, pci=cell.pci, ),
+            ),
             meas_report_desc=SrsEnbRRCellListMeasReportDesc()
-        ),)
+        ) for i, cell in enumerate(conf.cells))
     )
 
 

@@ -99,6 +99,7 @@ class SrsEnbRRCell:
     tac: int
     pci: int
     dl_earfcn: int
+    rf_port: int = 0
     ho_active: bool = False
     scell_list: tuple[SrsEnbRRCellListScell, ...] = field(default_factory=tuple)
     meas_cell_list: tuple[SrsEnbRRCellListMeasCell, ...] = field(default_factory=tuple)
