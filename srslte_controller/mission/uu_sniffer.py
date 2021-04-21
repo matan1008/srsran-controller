@@ -27,9 +27,12 @@ class UuSniffer:
         """
         Start tracking the Uu capture file for new packets.
         """
-        while self._run and not self._uu_pcap_ready():
+        while not self._uu_pcap_ready():
             await asyncio.sleep(0)
+            if not self._run:
+                return
 
+        await self._fix_pcap()
         # We use our own version of FileCapture since the original is not really async.
         cap = AsyncFileCapture(self.FIXED_CAP_FILE)
         while self._run:
