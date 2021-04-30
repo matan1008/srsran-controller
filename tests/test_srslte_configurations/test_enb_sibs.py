@@ -1,4 +1,4 @@
-from srslte_controller.srslte_configurations.enb_sibs import *
+from srsran_controller.srsran_configurations.enb_sibs import *
 from io import StringIO
 
 

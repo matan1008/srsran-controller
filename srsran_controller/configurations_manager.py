@@ -2,8 +2,8 @@ import json
 import pathlib
 from dataclasses import asdict
 
-from srslte_controller.exceptions import MissionIdNotFoundError
-from srslte_controller.mission.mission_configuration import MissionConfiguration
+from srsran_controller.exceptions import MissionIdNotFoundError
+from srsran_controller.mission.mission_configuration import MissionConfiguration
 
 
 class ConfigurationsManager:

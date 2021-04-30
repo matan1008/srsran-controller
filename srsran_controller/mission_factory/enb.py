@@ -1,10 +1,10 @@
-from srslte_controller.configuration import config
-from srslte_controller.mission.enb import Enb
-from srslte_controller.mission.lte_network import LteNetwork
-from srslte_controller.srslte_configurations.enb import *
-from srslte_controller.srslte_configurations.enb_drbs import *
-from srslte_controller.srslte_configurations.enb_rr import *
-from srslte_controller.srslte_configurations.enb_sibs import *
+from srsran_controller.configuration import config
+from srsran_controller.mission.enb import Enb
+from srsran_controller.mission.lte_network import LteNetwork
+from srsran_controller.srsran_configurations.enb import *
+from srsran_controller.srsran_configurations.enb_drbs import *
+from srsran_controller.srsran_configurations.enb_rr import *
+from srsran_controller.srsran_configurations.enb_sibs import *
 
 
 def build_sibs(conf):
@@ -47,7 +47,7 @@ def build_drbs():
 
 def build_rr(conf):
     """
-    :param srslte_controller.mission.mission_configuration.MissionConfiguration conf:
+    :param srsran_controller.mission.mission_configuration.MissionConfiguration conf:
     """
     return SrsEnbRR(
         cell_list=tuple(SrsEnbRRCell(
@@ -62,7 +62,7 @@ def build_rr(conf):
 
 def build_rf_configuration(conf):
     """
-    :param srslte_controller.mission.mission_configuration.MissionConfiguration conf:
+    :param srsran_controller.mission.mission_configuration.MissionConfiguration conf:
     """
     args = conf.device_args
     if conf.device_name == 'zmq':

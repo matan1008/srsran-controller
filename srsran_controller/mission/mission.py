@@ -1,8 +1,8 @@
 import asyncio
 
-from srslte_controller.configuration import config
-from srslte_controller.mission.uu_sniffer import UuSniffer
-from srslte_controller.uu_events.factory import EventsFactory
+from srsran_controller.configuration import config
+from srsran_controller.mission.uu_sniffer import UuSniffer
+from srsran_controller.uu_events.factory import EventsFactory
 
 
 class Mission:
@@ -10,9 +10,9 @@ class Mission:
     def __init__(self, epc, enb, network):
         """
         Create a new mission object.
-        :param srslte_controller.mission.epc.Epc epc: Mission's EPC.
-        :param srslte_controller.mission.enb.Enb enb: Mission's ENB.
-        :param srslte_controller.mission.lte_network.LteNetwork network: Mission's network.
+        :param srsran_controller.mission.epc.Epc epc: Mission's EPC.
+        :param srsran_controller.mission.enb.Enb enb: Mission's ENB.
+        :param srsran_controller.mission.lte_network.LteNetwork network: Mission's network.
         """
         self.uu_events = []
         self.uu_events_callback = lambda event: None

@@ -15,8 +15,8 @@ class Configuration:
     current_enb_rr_configuration: str
     current_enb_cap: str
     users_db: str
-    epc_docker_image: str = 'srslte-controller-docker:latest'
-    enb_docker_image: str = 'srslte-controller-docker:latest'
+    epc_docker_image: str = 'srsran-controller-docker:latest'
+    enb_docker_image: str = 'srsran-controller-docker:latest'
 
     def reload(self, path: str):
         """

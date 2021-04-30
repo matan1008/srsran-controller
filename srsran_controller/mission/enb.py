@@ -3,8 +3,8 @@ import pathlib
 
 import docker
 
-from srslte_controller.configuration import config
-from srslte_controller.mission.entity import Entity
+from srsran_controller.configuration import config
+from srsran_controller.mission.entity import Entity
 
 
 class Enb(Entity):

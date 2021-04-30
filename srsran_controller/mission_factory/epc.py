@@ -1,7 +1,7 @@
-from srslte_controller.configuration import config
-from srslte_controller.mission.epc import Epc
-from srslte_controller.mission.lte_network import LteNetwork
-from srslte_controller.srslte_configurations.epc import *
+from srsran_controller.configuration import config
+from srsran_controller.mission.epc import Epc
+from srsran_controller.mission.lte_network import LteNetwork
+from srsran_controller.srsran_configurations.epc import *
 
 
 def build_configuration(conf, epc_ip):

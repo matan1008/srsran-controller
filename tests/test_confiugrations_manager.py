@@ -3,9 +3,9 @@ from dataclasses import asdict
 
 import pytest
 
-from srslte_controller.configurations_manager import ConfigurationsManager
-from srslte_controller.exceptions import MissionIdNotFoundError
-from srslte_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor, EnbCell
+from srsran_controller.configurations_manager import ConfigurationsManager
+from srsran_controller.exceptions import MissionIdNotFoundError
+from srsran_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor, EnbCell
 
 
 def test_create_mission(tmpdir):

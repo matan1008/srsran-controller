@@ -1,11 +1,11 @@
-import srslte_controller.exceptions as exceptions
-from srslte_controller.configuration import config
-from srslte_controller.configurations_manager import ConfigurationsManager
-from srslte_controller.mission.mission import Mission
-from srslte_controller.mission_factory.mission import create as create_mission
+import srsran_controller.exceptions as exceptions
+from srsran_controller.configuration import config
+from srsran_controller.configurations_manager import ConfigurationsManager
+from srsran_controller.mission.mission import Mission
+from srsran_controller.mission_factory.mission import create as create_mission
 
 
-class SrslteController:
+class SrsranController:
 
     def __init__(self, configuration_path):
         config.reload(configuration_path)

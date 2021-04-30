@@ -1,6 +1,6 @@
 from io import StringIO
 
-from srslte_controller.srslte_configurations.enb import *
+from srsran_controller.srsran_configurations.enb import *
 
 
 def test_sanity():
