@@ -4,11 +4,11 @@ from contextlib import contextmanager
 from ipaddress import IPv4Network
 from tempfile import NamedTemporaryFile
 
-from srslte_controller.configuration import config
-from srslte_controller.mission.enb import Enb
-from srslte_controller.mission.lte_network import LteNetwork
-from srslte_controller.mission.mission_configuration import MissionConfiguration
-from srslte_controller.mission_factory.enb import build_configuration, build_rr, build_drbs, build_sibs
+from srsran_controller.configuration import config
+from srsran_controller.mission.enb import Enb
+from srsran_controller.mission.lte_network import LteNetwork
+from srsran_controller.mission.mission_configuration import MissionConfiguration
+from srsran_controller.mission_factory.enb import build_configuration, build_rr, build_drbs, build_sibs
 
 ENB_SANITY_LOG = 'Setting frequency'
 

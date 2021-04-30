@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from srslte_controller.uu_events.nas_emm_attach_request import create as create_attach_request
-from srslte_controller.uu_events.nas_emm_detach_request import create as create_detach_request
-from srslte_controller.uu_events.random_access_response import create as create_ra_response
-from srslte_controller.uu_events.rrc_connection_request import create as create_rrc_conn_request
+from srsran_controller.uu_events.nas_emm_attach_request import create as create_attach_request
+from srsran_controller.uu_events.nas_emm_detach_request import create as create_detach_request
+from srsran_controller.uu_events.random_access_response import create as create_ra_response
+from srsran_controller.uu_events.rrc_connection_request import create as create_rrc_conn_request
 
 
 class EventsFactory:

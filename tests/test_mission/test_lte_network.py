@@ -1,6 +1,6 @@
 import docker
 
-from srslte_controller.mission.lte_network import LteNetwork
+from srsran_controller.mission.lte_network import LteNetwork
 
 
 def test_create():

@@ -2,7 +2,7 @@ import docker
 import pytest
 from docker.errors import NotFound
 
-from srslte_controller.mission.entity import Entity
+from srsran_controller.mission.entity import Entity
 
 TEST_IMAGE_DOCKER = 'ubuntu'
 TEST_COMMAND = '/bin/yes'
