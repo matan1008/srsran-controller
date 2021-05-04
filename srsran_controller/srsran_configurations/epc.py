@@ -17,6 +17,8 @@ class SrsEpcMmeConfiguration:
     mnc: str
     mme_bind_addr: str
     apn: str
+    full_net_name: str
+    short_net_name: str
     dns_addr: str = '8.8.8.8'
     encryption_algo: str = 'EEA0'
     integrity_algo: str = 'EIA1'

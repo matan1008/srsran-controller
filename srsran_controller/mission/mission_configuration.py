@@ -29,6 +29,8 @@ class MissionConfiguration:
     device_name: str = 'zmq'
     device_args: str = ''
     enb_id: int = 0x19B
+    full_net_name: str = 'Full network name'
+    short_net_name: str = 'short'
 
     @staticmethod
     def from_dict(data: dict):

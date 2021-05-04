@@ -8,7 +8,8 @@ def test_sanity():
     SrsEpcConfiguration(
         mme=SrsEpcMmeConfiguration(
             mme_code='0x1a', mme_group='0x0001', tac=0x0007, mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
-            apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2
+            apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2,
+            short_net_name='short', full_net_name='full',
         ),
         hss=SrsEpcHssConfiguration(db_file='user_db.csv'),
         spgw=SrsEpcSpgwConfiguration(
@@ -29,6 +30,8 @@ def test_sanity():
         'mnc = 01\n'
         'mme_bind_addr = 127.0.1.100\n'
         'apn = srsapn\n'
+        'full_net_name = full\n'
+        'short_net_name = short\n'
         'dns_addr = 8.8.8.8\n'
         'encryption_algo = EEA0\n'
         'integrity_algo = EIA1\n'
@@ -66,7 +69,8 @@ def test_log_all():
     SrsEpcConfiguration(
         mme=SrsEpcMmeConfiguration(
             mme_code='0x1a', mme_group='0x0001', tac=0x0007, mcc='001', mnc='01', mme_bind_addr='127.0.1.100',
-            apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2
+            apn='srsapn', dns_addr='8.8.8.8', encryption_algo='EEA0', integrity_algo='EIA1', paging_timer=2,
+            short_net_name='short', full_net_name='full',
         ),
         hss=SrsEpcHssConfiguration(db_file='user_db.csv'),
         spgw=SrsEpcSpgwConfiguration(
@@ -84,6 +88,8 @@ def test_log_all():
         'mnc = 01\n'
         'mme_bind_addr = 127.0.1.100\n'
         'apn = srsapn\n'
+        'full_net_name = full\n'
+        'short_net_name = short\n'
         'dns_addr = 8.8.8.8\n'
         'encryption_algo = EEA0\n'
         'integrity_algo = EIA1\n'

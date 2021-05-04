@@ -84,6 +84,8 @@ def test_updating_all_configuration_values(tmpdir):
     conf.mme_group = '0x0002'
     conf.tac = 9
     conf.apn = 'inter'
+    conf.full_net_name = 'new full'
+    conf.short_net_name = 'new short'
     conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
     conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     conf.device_name = 'auto'
@@ -98,6 +100,8 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.mme_group == '0x0002'
     assert conf.tac == 9
     assert conf.apn == 'inter'
+    assert conf.full_net_name == 'new full'
+    assert conf.short_net_name == 'new short'
     assert conf.gsm_neighbors == [GsmNeighbor(arfcn=871, band='dcs1800')]
     assert conf.cells == [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     assert conf.device_name == 'auto'
