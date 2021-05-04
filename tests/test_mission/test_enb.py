@@ -1,10 +1,8 @@
-import os
 import time
 from contextlib import contextmanager
 from ipaddress import IPv4Network
 from tempfile import NamedTemporaryFile
 
-from srsran_controller.configuration import config
 from srsran_controller.mission.enb import Enb
 from srsran_controller.mission.lte_network import LteNetwork
 from srsran_controller.mission.mission_configuration import MissionConfiguration
@@ -56,31 +54,9 @@ def launch_enb():
 
 
 def test_launching_enb():
-    # Set the cap file to a file that doesn't exist.
-    with NamedTemporaryFile(delete=True, mode='w+', suffix='.pcap') as tmp_cap:
-        config.current_enb_cap = tmp_cap.name
-
     with launch_enb() as enb:
         # Wait for 5 seconds at most.
         for _ in range(5):
             if ENB_SANITY_LOG not in enb._container.logs().decode():
                 time.sleep(1)
         assert ENB_SANITY_LOG in enb._container.logs().decode()
-
-
-def test_launching_enb_cap_already_exists():
-    tagged_data = 'not random data'
-    # Set the cap file to a file that exists.
-    with NamedTemporaryFile(delete=False, mode='w+', suffix='.pcap') as tmp_cap:
-        tmp_cap.write(tagged_data)
-        config.current_enb_cap = tmp_cap.name
-
-    with launch_enb() as enb:
-        # Wait for 5 seconds at most.
-        for _ in range(5):
-            if ENB_SANITY_LOG not in enb._container.logs().decode():
-                time.sleep(1)
-        assert ENB_SANITY_LOG in enb._container.logs().decode()
-
-    # Make sure file was deleted
-    assert not os.path.exists(config.current_enb_cap)

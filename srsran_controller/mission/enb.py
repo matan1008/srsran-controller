@@ -1,6 +1,3 @@
-import os
-import pathlib
-
 import docker
 
 from srsran_controller.configuration import config
@@ -28,15 +25,12 @@ class Enb(Entity):
         :param network_id: Docker network to attach to.
         :param ip: Container IP inside the network.
         """
-        # The previous CAP file is irrelevant.
-        pathlib.Path(config.current_enb_cap).unlink(missing_ok=True)
         client = docker.from_env()
         volumes = {
             configuration_path: {'bind': Enb.CONF_CONTAINER_PATH, 'mode': 'ro'},
             sibs_path: {'bind': Enb.SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             drbs_path: {'bind': Enb.DRBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rr_path: {'bind': Enb.RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            os.path.dirname(config.current_enb_cap): {'bind': os.path.dirname(Enb.CAP_CONTAINER_PATH), 'mode': 'rw'},
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,

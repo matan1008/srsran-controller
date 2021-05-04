@@ -13,7 +13,6 @@ class Configuration:
     current_enb_sibs_configuration: str
     current_enb_drbs_configuration: str
     current_enb_rr_configuration: str
-    current_enb_cap: str
     users_db: str
     epc_docker_image: str = 'srsran-controller-docker:latest'
     enb_docker_image: str = 'srsran-controller-docker:latest'
@@ -31,4 +30,12 @@ class Configuration:
 
 # Since it contains paths, intentionally create it with invalid values so it must be reloaded before using it.
 
-config = Configuration('', '', '', '', '', '', '', '')
+config = Configuration(
+    missions_configurations_folder='',
+    current_epc_configuration='',
+    current_enb_configuration='',
+    current_enb_sibs_configuration='',
+    current_enb_drbs_configuration='',
+    current_enb_rr_configuration='',
+    users_db='',
+)

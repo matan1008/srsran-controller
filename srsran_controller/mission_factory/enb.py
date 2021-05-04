@@ -83,7 +83,7 @@ def build_configuration(conf, epc_ip, enb_ip):
                                               rr_config=Enb.RR_CONF_CONTAINER_PATH,
                                               drb_config=Enb.DRBS_CONF_CONTAINER_PATH),
         rf=build_rf_configuration(conf),
-        pcap=SrsEnbPcapConfiguration(filename=Enb.CAP_CONTAINER_PATH, s1ap_enable=False, s1ap_filename=''),
+        pcap=SrsEnbPcapConfiguration(mac_net_enable=True, client_ip=LteNetwork.GATEWAY),
         log=SrsEnbLogConfiguration(filename=Enb.LOG_CONTAINER_PATH, all_level='debug')
     )
 

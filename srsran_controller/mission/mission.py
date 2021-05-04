@@ -1,6 +1,5 @@
 import asyncio
 
-from srsran_controller.configuration import config
 from srsran_controller.mission.uu_sniffer import UuSniffer
 from srsran_controller.uu_events.factory import EventsFactory
 
@@ -17,7 +16,7 @@ class Mission:
         self.uu_events = []
         self.uu_events_callback = lambda event: None
         self._events_factory = EventsFactory(self._handle_uu_event)
-        self._sniffer = UuSniffer(config.current_enb_cap, self._events_factory)
+        self._sniffer = UuSniffer(self._events_factory, network.INTERFACE_NAME, network.GATEWAY)
         self._sniffing_task = asyncio.create_task(self._sniffer.start())
         self.epc = epc
         self.enb = enb
@@ -27,7 +26,7 @@ class Mission:
         """
         Stop the running mission.
         """
-        self._sniffer.stop()
+        self._sniffing_task.cancel()
         await self._sniffing_task
         self.enb.shutdown()
         self.epc.shutdown()

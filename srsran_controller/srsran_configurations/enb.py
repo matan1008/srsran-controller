@@ -37,10 +37,15 @@ class SrsEnbRfConfiguration:
 
 @dataclass
 class SrsEnbPcapConfiguration:
-    filename: str
-    s1ap_filename: str
-    enable: bool = True
-    s1ap_enable: bool = True
+    filename: str = '/tmp/enb.pcap'
+    s1ap_filename: str = '/tmp/enb_s1ap.pcap'
+    enable: bool = False
+    s1ap_enable: bool = False
+    mac_net_enable: bool = False
+    bind_ip: str = '0.0.0.0'
+    bind_port: int = 5687
+    client_ip: str = '127.0.0.1'
+    client_port: int = 5847
 
 
 @dataclass

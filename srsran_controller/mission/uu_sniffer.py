@@ -1,68 +1,59 @@
 import asyncio
-import os
-import subprocess
+import socket
+from contextlib import closing
 
 import pyshark
 
 
-class AsyncFileCapture(pyshark.FileCapture):
-    async def async_load_packets(self, packet_count=None):
-        """
-        Reads the packets from the source (cap, interface, etc.) and adds it to the internal list.
-        """
-        await self.packets_from_tshark(self._packets.append, packet_count=packet_count)
-        self.loaded = True
+class AsyncLiveCapture(pyshark.LiveCapture):
+    async def sniff_continuously(self, packet_count=None):
+        tshark_process = await self._get_tshark_process()
+        psml_structure, data = await self._get_psml_struct(tshark_process.stdout)
+        packets_captured = 0
+
+        data = b''
+        try:
+            while True:
+                try:
+                    packet, data = await self._get_packet_from_stream(tshark_process.stdout, data,
+                                                                      psml_structure=psml_structure,
+                                                                      got_first_packet=packets_captured > 0)
+                except EOFError:
+                    self._log.debug('EOF reached (sync)')
+                    self._eof_reached = True
+                    break
+
+                if packet:
+                    packets_captured += 1
+                    yield packet
+                if packet_count and packets_captured >= packet_count:
+                    break
+        finally:
+            if tshark_process in self._running_processes:
+                await self._cleanup_subprocess(tshark_process)
 
 
 class UuSniffer:
-    FIXED_CAP_FILE = '/tmp/fixed_enb.pcap'
+    MAC_LTE_PORT = 5847
 
-    def __init__(self, uu_cap, parser):
-        self._cap_index = 0
-        self._run = True
-        self._uu_cap = uu_cap
+    def __init__(self, parser, interface, addr, port=MAC_LTE_PORT):
         self._parser = parser
+        self._interface = interface
+        self._addr = addr
+        self._port = port
 
     async def start(self):
         """
-        Start tracking the Uu capture file for new packets.
+        Start tracking the Uu interface for new packets.
         """
-        while not self._uu_pcap_ready():
-            await asyncio.sleep(0)
-            if not self._run:
-                return
-
-        await self._fix_pcap()
-        # We use our own version of FileCapture since the original is not really async.
-        cap = AsyncFileCapture(self.FIXED_CAP_FILE)
-        while self._run:
-            await self._fix_pcap()
-            await self._reload_cap(cap)
-            self._publish_new_packets(cap)
-            self._cap_index = len(cap)
-
-    def stop(self):
-        """
-        Stop tracking.
-        """
-        self._run = False
-
-    @staticmethod
-    async def _reload_cap(cap):
-        cap.clear()
-        await cap.async_load_packets()
-
-    async def _fix_pcap(self):
-        await asyncio.create_subprocess_exec(
-            'pcapfix', self._uu_cap, '-o', self.FIXED_CAP_FILE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
-
-    def _uu_pcap_ready(self):
-        return os.path.exists(self._uu_cap) and os.stat(self._uu_cap).st_size
-
-    def _publish_new_packets(self, cap):
-        for i, packet in enumerate(cap):
-            if i < self._cap_index:
-                # Packets already read.
-                continue
-            self._parser.from_packet(packet)
+        # The socket is required in order to prevent ICMP destination port unreachable from being sent.
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as sock:
+            sock.bind((self._addr, self._port))
+            try:
+                async with AsyncLiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface) as cap:
+                    gen = cap.sniff_continuously()
+                    while True:
+                        packet = await gen.__anext__()
+                        self._parser.from_packet(packet)
+            except asyncio.CancelledError:
+                pass
