@@ -66,6 +66,13 @@ def test_delete_mission_error(tmpdir):
         assert configuration_manager.delete_mission('mission_that_doesnt_exist')
 
 
+def test_list_missions(tmpdir):
+    configuration_manager = ConfigurationsManager(tmpdir)
+    conf1 = configuration_manager.create_mission()
+    conf2 = configuration_manager.create_mission()
+    assert len(configuration_manager.list_missions()) == 2
+
+
 def test_mission_with_gsm_neighbor(tmpdir):
     configuration_manager = ConfigurationsManager(tmpdir)
     conf = configuration_manager.create_mission()

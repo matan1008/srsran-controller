@@ -31,17 +31,23 @@ class ConfigurationsManager:
     def delete_mission(self, mission_configuration_id):
         self._on_mission_configuration(mission_configuration_id, lambda f, data: f.unlink())
 
+    def list_missions(self):
+        return list(map(lambda m: MissionConfiguration.from_dict(m[1]), self._iter_missions()))
+
     @property
     def _missions_path(self):
         return pathlib.Path(self._missions_configurations_folder)
 
-    def _on_mission_configuration(self, configuration_id, operation):
+    def _iter_missions(self):
         for f in filter(lambda p: p.is_file(), self._missions_path.iterdir()):
             try:
                 with open(f, 'r') as fd:
-                    data = json.load(fd)
-                if data['id'] == configuration_id:
-                    return operation(f, data)
+                    yield f, json.load(fd)
             except json.JSONDecodeError:
                 pass
+
+    def _on_mission_configuration(self, configuration_id, operation):
+        for f, data in self._iter_missions():
+            if data['id'] == configuration_id:
+                return operation(f, data)
         raise MissionIdNotFoundError()
