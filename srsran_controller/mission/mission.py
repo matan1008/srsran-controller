@@ -61,10 +61,12 @@ class Mission:
         async for packet in sniffer.start(use_json=True):
             self.uu_packets_callback(packet)
             for event in events_factory.from_packet(packet):
-                self._handle_uu_event(event)
+                await self._handle_uu_event(event)
 
-    def _handle_uu_event(self, event):
+    async def _handle_uu_event(self, event):
         self.logger.debug(f'Handle Uu event: {event}')
+        if 'imsi' not in event and 'tmsi' in event:
+            event['imsi'] = await self.epc.imsi_from_tmsi(event['tmsi'])
         self.uu_events.append(event)
         self.channel_tracker.handle_uu_event(event)
         self.channel_tracker.enrich_event(event)

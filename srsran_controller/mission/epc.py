@@ -1,6 +1,9 @@
+import struct
+
 import docker
 
 from srsran_controller.common.docker.entity import Entity
+from srsran_controller.common.ip import asyncio_udp_send_receive
 from srsran_controller.common.ip import construct_forward
 from srsran_controller.configuration import config
 
@@ -13,6 +16,7 @@ class Epc(Entity):
     TUN_CONTROL_PATH = '/dev/net/tun'
     LOG_CONTAINER_PATH = '/tmp/epc.log'
     CAP_CONTAINER_PATH = '/tmp/epc.pcap'
+    CONTROL_PORT = 4567
     SGI_INTERFACE_NAME = 'srs_spgw_sgi'
 
     @staticmethod
@@ -37,6 +41,19 @@ class Epc(Entity):
         epc = Epc(container)
         epc._disconnect('none')
         return epc
+
+    async def imsi_from_tmsi(self, tmsi: str) -> str:
+        """
+        Fetch an IMSI of a TMSI from the EPC.
+        :param tmsi: Known TMSI.
+        :return: IMSI if known, else empty string.
+        """
+        request = b'find_imsi_from_tmsi ' + struct.pack('<I', int(tmsi, 16))
+        response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
+        imsi, = struct.unpack('<Q', response)
+        if not imsi:
+            return ''
+        return f'{imsi:015}'
 
     def ip_forward(self, network) -> None:
         """
