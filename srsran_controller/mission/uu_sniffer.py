@@ -50,7 +50,8 @@ class UuSniffer:
         with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as sock:
             sock.bind((self._addr, self._port))
             try:
-                async with AsyncLiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface) as cap:
+                async with AsyncLiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface,
+                                            eventloop=asyncio.get_event_loop()) as cap:
                     gen = cap.sniff_continuously()
                     while True:
                         packet = await gen.__anext__()
