@@ -1,3 +1,5 @@
+import pathlib
+
 import srsran_controller.exceptions as exceptions
 from srsran_controller.configuration import config
 from srsran_controller.configurations_manager import ConfigurationsManager
@@ -10,6 +12,7 @@ class SrsranController:
     def __init__(self, configuration_path):
         config.reload(configuration_path)
         self.configurations = ConfigurationsManager(config.missions_configurations_folder)
+        pathlib.Path(config.missions_configurations_folder).mkdir(parents=True, exist_ok=True)
         self._current_mission = None
 
     @property
