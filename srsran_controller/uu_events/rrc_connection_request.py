@@ -1,5 +1,6 @@
 RRC_CONNECTION_REQUEST_TAG = 'lte_rrc_rrcconnectionrequest_element'
 RRC_TMSI_TAG = 'lte_rrc_m_tmsi'
+CONNECTION_REQUEST_NAME = 'RRC connection request'
 
 
 def create(pkt):
@@ -13,7 +14,7 @@ def create(pkt):
         if not identity:
             return
         event = {
-            'event': 'RRC connection request',
+            'event': CONNECTION_REQUEST_NAME,
             'rnti': int(mac_layer.rnti)
         }
         event.update(identity)

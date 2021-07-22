@@ -1,6 +1,7 @@
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.nas_emm_security_mode_complete import create as create_security_mode_complete
+from srsran_controller.uu_events.nas_emm_security_mode_complete import create as create_security_mode_complete, \
+    SECURITY_MODE_COMPLETE_NAME
 
 SECURITY_MODE_COMPLETE_IMEI = (
     '0a0d0d0ab80000004d3c2b1a01000000ffffffffffffffff02003500496e74656c28522920436f726528544d292069372d37373030204350'
@@ -30,4 +31,4 @@ def test_parsing_emm_security_mode_complete_imei(tmp_path):
     p.write_bytes(bytes.fromhex(SECURITY_MODE_COMPLETE_IMEI))
     with FileCapture(str(p)) as pcap:
         res = create_security_mode_complete(list(pcap)[0])
-    assert res == {'imeisv': '3534900698733153', 'event': 'Security mode complete', 'rnti': 70}
+    assert res == {'imeisv': '3534900698733153', 'event': SECURITY_MODE_COMPLETE_NAME, 'rnti': 70}

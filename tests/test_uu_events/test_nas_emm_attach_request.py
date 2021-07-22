@@ -1,6 +1,6 @@
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.nas_emm_attach_request import create as create_attach_request
+from srsran_controller.uu_events.nas_emm_attach_request import create as create_attach_request, ATTACH_REQUEST_NAME
 
 ATTACH_REQUEST_PCAP_DATA = (
     'd4c3b2a1020004000000000000000000ffff0000950000000ac78b60366504003702000037020000beefdead023700006d61632d6c746501'
@@ -22,4 +22,4 @@ def test_parsing_emm_attach_request(tmp_path):
     p.write_bytes(bytes.fromhex(ATTACH_REQUEST_PCAP_DATA))
     pcap = FileCapture(str(p))
     rar = create_attach_request(list(pcap)[0])
-    assert rar == {'imsi': '001010123456789', 'event': 'Attach request', 'rnti': 70}
+    assert rar == {'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME, 'rnti': 70}

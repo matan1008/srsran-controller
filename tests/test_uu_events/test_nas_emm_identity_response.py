@@ -1,6 +1,7 @@
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.nas_emm_identity_response import create as create_identity_response
+from srsran_controller.uu_events.nas_emm_identity_response import create as create_identity_response, \
+    IDENTITY_RESPONSE_NAME
 
 IDENTITY_RESPONSE_PCAP_DATA_IMSI = (
     '0a0d0d0ab80000004d3c2b1a01000000ffffffffffffffff02003500496e74656c28522920436f726528544d292069372d343737302043505'
@@ -29,4 +30,4 @@ def test_parsing_emm_identity_response_imsi(tmp_path):
     p.write_bytes(bytes.fromhex(IDENTITY_RESPONSE_PCAP_DATA_IMSI))
     pcap = FileCapture(str(p))
     rar = create_identity_response(list(pcap)[0])
-    assert rar == {'imsi': '001010123456789', 'event': 'Identity response', 'rnti': 74}
+    assert rar == {'imsi': '001010123456789', 'event': IDENTITY_RESPONSE_NAME, 'rnti': 74}
