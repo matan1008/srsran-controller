@@ -18,6 +18,7 @@ class GsmNeighbor:
 @dataclass
 class MissionConfiguration:
     id: str = field(default_factory=lambda: str(uuid4()))
+    name: str = 'New mission'
     mcc: str = '001'
     mnc: str = '01'
     mme_code: str = '0x1a'

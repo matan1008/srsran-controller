@@ -85,6 +85,7 @@ def test_mission_with_gsm_neighbor(tmpdir):
 def test_updating_all_configuration_values(tmpdir):
     configuration_manager = ConfigurationsManager(tmpdir)
     conf = configuration_manager.create_mission()
+    conf.name = 'Old mission'
     conf.mcc = '901'
     conf.mnc = '01'
     conf.mme_code = '0x1b'
@@ -101,6 +102,7 @@ def test_updating_all_configuration_values(tmpdir):
     configuration_manager.update_mission(conf)
     conf = configuration_manager.get_mission(conf.id)
 
+    assert conf.name == 'Old mission'
     assert conf.mcc == '901'
     assert conf.mnc == '01'
     assert conf.mme_code == '0x1b'
