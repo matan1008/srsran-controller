@@ -37,6 +37,8 @@ class ChannelTracker:
             event['imeisv'] = channel_metadata.imeisv
 
     def handle_uu_event(self, event: dict) -> None:
+        if event['event'] not in self._events_handlers:
+            return
         self._events_handlers[event['event']](event)
 
     def _handle_rar(self, event):
