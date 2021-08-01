@@ -18,6 +18,8 @@ class GsmNeighbor:
 @dataclass
 class MissionConfiguration:
     id: str = field(default_factory=lambda: str(uuid4()))
+    gsm_neighbors: list[GsmNeighbor] = field(default_factory=list)
+    cells: list[EnbCell] = field(default_factory=lambda: [EnbCell()])
     name: str = 'New mission'
     mcc: str = '001'
     mnc: str = '01'
@@ -25,8 +27,6 @@ class MissionConfiguration:
     mme_group: str = '0x0001'
     tac: int = 0x0007
     apn: str = 'internet'
-    gsm_neighbors: list[GsmNeighbor] = field(default_factory=list)
-    cells: list[EnbCell] = field(default_factory=lambda: [EnbCell()])
     device_name: str = 'zmq'
     device_args: str = ''
     enb_id: int = 0x19B
