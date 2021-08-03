@@ -5,6 +5,7 @@ from srsran_controller.configuration import config
 from srsran_controller.configurations_manager import ConfigurationsManager
 from srsran_controller.mission.mission import Mission
 from srsran_controller.mission_factory.mission import create as create_mission
+from srsran_controller.subscribers_manager import SubscribersManager
 
 
 class SrsranController:
@@ -13,6 +14,7 @@ class SrsranController:
         config.reload(configuration_path)
         self.configurations = ConfigurationsManager(config.missions_configurations_folder)
         pathlib.Path(config.missions_configurations_folder).mkdir(parents=True, exist_ok=True)
+        self.subscribers = SubscribersManager()
         self._current_mission = None
 
     @property
