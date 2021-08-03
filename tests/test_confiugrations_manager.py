@@ -68,8 +68,8 @@ def test_delete_mission_error(tmpdir):
 
 def test_list_missions(tmpdir):
     configuration_manager = ConfigurationsManager(tmpdir)
-    conf1 = configuration_manager.create_mission()
-    conf2 = configuration_manager.create_mission()
+    configuration_manager.create_mission()
+    configuration_manager.create_mission()
     assert len(configuration_manager.list_missions()) == 2
 
 
