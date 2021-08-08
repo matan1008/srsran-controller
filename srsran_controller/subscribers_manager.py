@@ -3,8 +3,6 @@ from dataclasses import dataclass
 
 from srsran_controller.configuration import config
 
-CSV_COLUMNS = ['name', 'auth', 'imsi', 'key', 'op_type', 'op', 'amf', 'sqn', 'qci', 'ip']
-
 
 @dataclass
 class Subscriber:
