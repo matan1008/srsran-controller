@@ -27,8 +27,8 @@ class MissionConfiguration:
     mme_group: str = '0x0001'
     tac: int = 0x0007
     apn: str = 'internet'
-    device_name: str = 'zmq'
-    device_args: str = ''
+    device_name: str = 'UHD'
+    device_args: str = 'clock=gpsdo'
     enb_id: int = 0x19B
     full_net_name: str = 'Full network name'
     short_net_name: str = 'short'

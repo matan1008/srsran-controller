@@ -45,7 +45,7 @@ def configuration_files(conf, epc_ip, enb_ip):
 @contextmanager
 def launch_enb():
     epc_ip, enb_ip = map(str, list(IPv4Network(LteNetwork.SUBNET).hosts())[0:2])
-    conf = MissionConfiguration()
+    conf = MissionConfiguration(device_name='zmq')
     with configuration_files(conf, epc_ip, enb_ip) as config_files:
         enb_conf, sibs, drbs, rr = config_files
         with shutdown(LteNetwork.create()):

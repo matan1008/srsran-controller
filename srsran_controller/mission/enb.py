@@ -34,7 +34,7 @@ class Enb(Entity):
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,
-            name=Enb.CONTAINER_NAME, network_mode='none'
+            name=Enb.CONTAINER_NAME, network_mode='none', privileged=True
         )
         enb = Enb(container)
         enb._connect_to_network(network_id, ip)
