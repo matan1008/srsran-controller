@@ -1,6 +1,6 @@
 import json
-import pathlib
 from dataclasses import asdict
+from pathlib import Path
 
 from srsran_controller.exceptions import MissionIdNotFoundError
 from srsran_controller.mission.mission_configuration import MissionConfiguration
@@ -32,11 +32,17 @@ class ConfigurationsManager:
         self._on_mission_configuration(mission_configuration_id, lambda f, data: f.unlink())
 
     def list_missions(self):
-        return list(map(lambda m: MissionConfiguration.from_dict(m[1]), self._iter_missions()))
+        missions = []
+        for f, data in self._iter_missions():
+            try:
+                missions.append(MissionConfiguration.from_dict(data))
+            except TypeError:
+                print(f'Could not load mission {f.name}')
+        return missions
 
     @property
-    def _missions_path(self):
-        return pathlib.Path(self._missions_configurations_folder)
+    def _missions_path(self) -> Path:
+        return Path(self._missions_configurations_folder)
 
     def _iter_missions(self):
         for f in filter(lambda p: p.is_file(), self._missions_path.iterdir()):

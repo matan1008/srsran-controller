@@ -1,5 +1,6 @@
 import json
 from dataclasses import asdict
+from uuid import uuid4
 
 import pytest
 
@@ -116,3 +117,22 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.device_name == 'auto'
     assert conf.device_args == 'serial=33333333'
     assert conf.enb_id == 0x19a
+
+
+def test_invalid_mission_format(tmpdir):
+    with open(tmpdir / str(uuid4()), 'w') as fd:
+        fd.write('Not a valid JSON {{{')
+    configuration_manager = ConfigurationsManager(tmpdir)
+    mission = configuration_manager.create_mission()
+    assert configuration_manager.list_missions() == [mission]
+
+
+def test_invalid_mission_fields(tmpdir):
+    mission = asdict(MissionConfiguration())
+    mission['not_enb_id'] = mission['enb_id']
+    del mission['enb_id']
+    with open(tmpdir / mission['id'], 'w') as fd:
+        json.dump(mission, fd, indent=4)
+    configuration_manager = ConfigurationsManager(tmpdir)
+    mission = configuration_manager.create_mission()
+    assert configuration_manager.list_missions() == [mission]
