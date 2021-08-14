@@ -11,3 +11,8 @@ class MissionIdNotFoundError(SrsranControllerException):
 class MissionAlreadyRunningError(SrsranControllerException):
     """ Raise when trying to launch a mission while another mission is running. """
     pass
+
+
+class MissionIsNotRunningError(SrsranControllerException):
+    """ Raise when trying to stop a mission while no mission is running. """
+    pass
