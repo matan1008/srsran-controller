@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from srsran_controller.uu_events.nas_emm_attach_accept import create as create_attach_accept
 from srsran_controller.uu_events.nas_emm_attach_request import create as create_attach_request
 from srsran_controller.uu_events.nas_emm_detach_request import create as create_detach_request
 from srsran_controller.uu_events.nas_emm_identity_response import create as create_identity_response
@@ -13,6 +14,7 @@ class EventsFactory:
     def __init__(self, callback):
         self.callback = callback
         self.events_creators = [
+            create_attach_accept,
             create_attach_request,
             create_detach_request,
             create_identity_response,
