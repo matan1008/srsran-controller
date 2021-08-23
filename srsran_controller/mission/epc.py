@@ -12,6 +12,7 @@ class Epc(Entity):
     TUN_CONTROL_PATH = '/dev/net/tun'
     LOG_CONTAINER_PATH = '/tmp/epc.log'
     CAP_CONTAINER_PATH = '/tmp/epc.pcap'
+    PING_COMMAND = 'ping {}'
 
     @staticmethod
     def create(configuration_path: str, hss_db: str, network_id: str, ip: str):
@@ -39,3 +40,13 @@ class Epc(Entity):
         container.start()
         epc._wait_for_ip()
         return epc
+
+    def ping(self, ip: str):
+        """
+        Run ping command inside the container.
+        :param ip: IP to ping.
+        :return: Socket connected to the ping stdin and stdout.
+        :rtype: socket.socket
+        """
+        _, sock = self._container.exec_run(self.PING_COMMAND.format(ip), stdin=True, socket=True, tty=True)
+        return sock._sock
