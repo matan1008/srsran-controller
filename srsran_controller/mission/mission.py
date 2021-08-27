@@ -28,6 +28,7 @@ class Mission:
         self.enb = enb
         self._network = network
         self.pings = []
+        self.start_time = datetime.now()
 
     async def ping(self, imsi: str) -> Ping:
         """
