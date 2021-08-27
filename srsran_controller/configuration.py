@@ -16,6 +16,7 @@ class Configuration:
     users_db: str
     epc_docker_image: str = 'srsran-controller-docker:latest'
     enb_docker_image: str = 'srsran-controller-docker:latest'
+    sudo_password: str = ''  # Never save it in a json, required for run time only.
 
     def reload(self, path: str):
         """

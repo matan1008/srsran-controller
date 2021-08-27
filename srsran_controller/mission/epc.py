@@ -1,5 +1,6 @@
 import docker
 
+from srsran_controller.common.ip import construct_iptables_append
 from srsran_controller.configuration import config
 from srsran_controller.mission.entity import Entity
 
@@ -13,15 +14,14 @@ class Epc(Entity):
     LOG_CONTAINER_PATH = '/tmp/epc.log'
     CAP_CONTAINER_PATH = '/tmp/epc.pcap'
     PING_COMMAND = 'ping {}'
+    SGI_INTERFACE_NAME = 'srs_spgw_sgi'
 
     @staticmethod
-    def create(configuration_path: str, hss_db: str, network_id: str, ip: str):
+    def create(configuration_path: str, hss_db: str):
         """
         Create a SrsEPC instance.
         :param configuration_path: SrsEPC configuration path.
         :param hss_db: SrsEPC users DB (HSS configuration) path.
-        :param network_id: Docker network to attach to.
-        :param ip: Container IP inside the network.
         :return: Epc object.
         :rtype: Epc
         """
@@ -36,9 +36,7 @@ class Epc(Entity):
             name=Epc.CONTAINER_NAME, network_mode='none'
         )
         epc = Epc(container)
-        epc._connect_to_network(network_id, ip)
-        container.start()
-        epc._wait_for_ip()
+        epc._disconnect('none')
         return epc
 
     def ping(self, ip: str):
@@ -50,3 +48,12 @@ class Epc(Entity):
         """
         _, sock = self._container.exec_run(self.PING_COMMAND.format(ip), stdin=True, socket=True, tty=True)
         return sock._sock
+
+    def ip_forward(self, network):
+        out = network.INTERFACE_NAME + '0'  # Docker adds an index for bridges
+        self._container.exec_run(construct_iptables_append('FORWARD', 'ACCEPT', in_=self.SGI_INTERFACE_NAME, out=out))
+        self._container.exec_run(construct_iptables_append('FORWARD', 'ACCEPT', in_=out, out=self.SGI_INTERFACE_NAME,
+                                                           state='ESTABLISHED,RELATED'))
+
+        self._container.exec_run(construct_iptables_append('POSTROUTING', 'MASQUERADE', table='nat', out=out))
+        self._container.exec_run(f'ip route replace default via {network.GATEWAY} dev {out}')

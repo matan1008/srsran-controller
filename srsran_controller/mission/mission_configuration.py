@@ -32,6 +32,7 @@ class MissionConfiguration:
     enb_id: int = 0x19B
     full_net_name: str = 'Full network name'
     short_net_name: str = 'short'
+    external_interface: str = 'none'
 
     @staticmethod
     def from_dict(data: dict):
