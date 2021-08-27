@@ -24,6 +24,8 @@ class Ping:
         self.stopped = False
         self.id = str(uuid4())
         self.logs = []
+        self.start_time = datetime.now()
+        self.stop_time = None
         self._read_logs_task = asyncio.create_task(self._read_logs())
 
     @staticmethod
@@ -57,6 +59,7 @@ class Ping:
         await self._writer.drain()
         self._writer.close()
         await self._writer.wait_closed()
+        self.stop_time = datetime.now()
         self.stopped = True
         self.status = PingStatus.STOPPED
         self._status_callback(self)
