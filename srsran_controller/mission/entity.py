@@ -9,6 +9,12 @@ class Entity:
         """
         self._container = container
 
+    def start(self):
+        """
+        Start the entity.
+        """
+        self._container.start()
+
     @property
     def ip(self) -> str:
         return list(self._container.attrs['NetworkSettings']['Networks'].values())[0]['IPAddress']
@@ -24,16 +30,22 @@ class Entity:
             # Docker already killed and removed.
             pass
 
-    def _connect_to_network(self, network_id: str, ip: str):
+    def connect(self, network, ip: str):
         """
         Connect the underlying container to a specified docker network, giving it the specified IP address.
-        :param network_id: Docker network to attach to.
+        :param srsran_controller.mission.network.Network network: Docker network to attach to.
         :param ip: Container IP inside the network.
         """
         client = docker.from_env()
-        client.networks.list(names=['none'])[0].disconnect(self._container)
-        client.networks.get(network_id).connect(self._container, ipv4_address=ip)
+        client.networks.get(network.id).connect(self._container, ipv4_address=ip)
 
-    def _wait_for_ip(self):
+    def wait_for_ip(self):
+        """
+        Wait for entity to get an IP address.
+        """
         while not self.ip:
             self._container.reload()
+
+    def _disconnect(self, network_name):
+        client = docker.from_env()
+        client.networks.list(names=[network_name])[0].disconnect(self._container)

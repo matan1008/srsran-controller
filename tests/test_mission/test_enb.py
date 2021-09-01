@@ -48,9 +48,9 @@ def launch_enb():
     conf = MissionConfiguration(device_name='zmq')
     with configuration_files(conf, epc_ip, enb_ip) as config_files:
         enb_conf, sibs, drbs, rr = config_files
-        with shutdown(LteNetwork.create()):
-            with shutdown(Enb.create(enb_conf, sibs, drbs, rr, LteNetwork.NAME, enb_ip)) as enb:
-                yield enb
+        with shutdown(Enb.create(enb_conf, sibs, drbs, rr)) as enb:
+            enb.start()
+            yield enb
 
 
 def test_launching_enb():

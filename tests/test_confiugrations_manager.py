@@ -100,6 +100,7 @@ def test_updating_all_configuration_values(tmpdir):
     conf.device_name = 'auto'
     conf.device_args = 'serial=33333333'
     conf.enb_id = 0x19a
+    conf.external_interface = 'new external interface'
     configuration_manager.update_mission(conf)
     conf = configuration_manager.get_mission(conf.id)
 
@@ -117,6 +118,7 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.device_name == 'auto'
     assert conf.device_args == 'serial=33333333'
     assert conf.enb_id == 0x19a
+    assert conf.external_interface == 'new external interface'
 
 
 def test_invalid_mission_format(tmpdir):

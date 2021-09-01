@@ -9,12 +9,13 @@ from srsran_controller.uu_events.factory import EventsFactory
 
 class Mission:
 
-    def __init__(self, epc, enb, network):
+    def __init__(self, epc, enb, lte_network, pgw_network=None):
         """
         Create a new mission object.
         :param srsran_controller.mission.epc.Epc epc: Mission's EPC.
         :param srsran_controller.mission.enb.Enb enb: Mission's ENB.
-        :param srsran_controller.mission.lte_network.LteNetwork network: Mission's network.
+        :param srsran_controller.mission.lte_network.LteNetwork lte_network: Mission's network.
+        :param srsran_controller.mission.pgw_network.PgwNetwork pgw_network: P-GW network.
         """
         self.uu_events = []
         self.uu_events_callback = lambda event: None
@@ -22,11 +23,12 @@ class Mission:
         self.ping_log_callback = lambda ping, time, log: None
         self.channel_tracker = ChannelTracker()
         self._events_factory = EventsFactory(self._handle_uu_event)
-        self._sniffer = UuSniffer(self._events_factory, network.INTERFACE_NAME, network.GATEWAY)
+        self._sniffer = UuSniffer(self._events_factory, lte_network.INTERFACE_NAME, lte_network.GATEWAY)
         self._sniffing_task = asyncio.create_task(self._sniffer.start())
         self.epc = epc
         self.enb = enb
-        self._network = network
+        self._lte_network = lte_network
+        self._pgw_network = pgw_network
         self.pings = []
         self.start_time = datetime.now()
 
@@ -59,7 +61,9 @@ class Mission:
         await self._sniffing_task
         self.enb.shutdown()
         self.epc.shutdown()
-        self._network.shutdown()
+        self._lte_network.shutdown()
+        if self._pgw_network is not None:
+            self._pgw_network.shutdown()
 
     def _handle_uu_event(self, event):
         self.uu_events.append(event)

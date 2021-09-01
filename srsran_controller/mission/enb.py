@@ -15,15 +15,13 @@ class Enb(Entity):
     LOG_CONTAINER_PATH = '/tmp/enb.log'
 
     @staticmethod
-    def create(configuration_path: str, sibs_path: str, drbs_path: str, rr_path: str, network_id: str, ip: str):
+    def create(configuration_path: str, sibs_path: str, drbs_path: str, rr_path: str):
         """
         Create a SrsENB instance.
         :param configuration_path: SrsENB configuration path.
         :param sibs_path: Sibs configuration path.
         :param drbs_path: DRBs configuration path.
         :param rr_path: RR configuration path.
-        :param network_id: Docker network to attach to.
-        :param ip: Container IP inside the network.
         """
         client = docker.from_env()
         volumes = {
@@ -37,7 +35,5 @@ class Enb(Entity):
             name=Enb.CONTAINER_NAME, network_mode='none', privileged=True
         )
         enb = Enb(container)
-        enb._connect_to_network(network_id, ip)
-        container.start()
-        enb._wait_for_ip()
+        enb._disconnect('none')
         return enb

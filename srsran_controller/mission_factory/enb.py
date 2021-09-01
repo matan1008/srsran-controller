@@ -88,7 +88,15 @@ def build_configuration(conf, epc_ip, enb_ip):
     )
 
 
-def create(conf, epc_ip, enb_ip):
+def create(conf, lte_network, epc_ip, enb_ip):
+    """
+    Factory method for Enb objects.
+    :param srsran_controller.mission.mission_configuration.MissionConfiguration conf: Mission configuration.
+    :param lte_network: Network to attach to.
+    :param epc_ip: EPC IP inside the lte network.
+    :param enb_ip: IP inside the lte network.
+    :return: Launched Epc object.
+    """
     with open(config.current_enb_sibs_configuration, 'w') as fd:
         build_sibs(conf).write(fd)
     with open(config.current_enb_drbs_configuration, 'w') as fd:
@@ -97,7 +105,11 @@ def create(conf, epc_ip, enb_ip):
         build_rr(conf).write(fd)
     with open(config.current_enb_configuration, 'w') as fd:
         build_configuration(conf, epc_ip, enb_ip).write(fd)
-    return Enb.create(
+    enb = Enb.create(
         config.current_enb_configuration, config.current_enb_sibs_configuration,
-        config.current_enb_drbs_configuration, config.current_enb_rr_configuration, LteNetwork.NAME, enb_ip
+        config.current_enb_drbs_configuration, config.current_enb_rr_configuration
     )
+    enb.connect(lte_network, enb_ip)
+    enb.start()
+    enb.wait_for_ip()
+    return enb
