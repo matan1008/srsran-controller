@@ -1,6 +1,6 @@
 import docker
 
-from srsran_controller.common.ip import construct_iptables_append
+from srsran_controller.common.ip import construct_forward
 from srsran_controller.configuration import config
 from srsran_controller.mission.entity import Entity
 
@@ -49,11 +49,12 @@ class Epc(Entity):
         _, sock = self._container.exec_run(self.PING_COMMAND.format(ip), stdin=True, socket=True, tty=True)
         return sock._sock
 
-    def ip_forward(self, network):
+    def ip_forward(self, network) -> None:
+        """
+        Forward ip transportation from the EPC to the specified network.
+        :param network: Network to forward communication to.
+        """
         out = network.INTERFACE_NAME + '0'  # Docker adds an index for bridges
-        self._container.exec_run(construct_iptables_append('FORWARD', 'ACCEPT', in_=self.SGI_INTERFACE_NAME, out=out))
-        self._container.exec_run(construct_iptables_append('FORWARD', 'ACCEPT', in_=out, out=self.SGI_INTERFACE_NAME,
-                                                           state='ESTABLISHED,RELATED'))
-
-        self._container.exec_run(construct_iptables_append('POSTROUTING', 'MASQUERADE', table='nat', out=out))
+        for iptable_command in construct_forward(self.SGI_INTERFACE_NAME, out):
+            self._container.exec_run(iptable_command)
         self._container.exec_run(f'ip route replace default via {network.GATEWAY} dev {out}')

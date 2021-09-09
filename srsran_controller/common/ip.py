@@ -16,9 +16,14 @@ def construct_iptables_append(chain, jump, table='', in_='', out='', state=''):
     return command
 
 
+def construct_forward(from_, to):
+    return [
+        construct_iptables_append('FORWARD', 'ACCEPT', in_=from_, out=to),
+        construct_iptables_append('FORWARD', 'ACCEPT', in_=to, out=from_, state='ESTABLISHED,RELATED'),
+        construct_iptables_append('POSTROUTING', 'MASQUERADE', out=to, table='nat'),
+    ]
+
+
 def forward_interfaces(from_, to, password):
-    run_as_sudo(construct_iptables_append('FORWARD', 'ACCEPT', in_=from_, out=to), password)
-    run_as_sudo(
-        construct_iptables_append('FORWARD', 'ACCEPT', in_=to, out=from_, state='ESTABLISHED,RELATED'), password
-    )
-    run_as_sudo(construct_iptables_append('POSTROUTING', 'MASQUERADE', out=to, table='nat'), password)
+    for iptable_command in construct_forward(from_, to):
+        run_as_sudo(iptable_command, password)
