@@ -12,8 +12,7 @@ from srsran_controller.uu_events.rrc_connection_request import create as create_
 
 class EventsFactory:
 
-    def __init__(self, callback):
-        self.callback = callback
+    def __init__(self):
         self.events_creators = [
             create_gsm_sms_submit,
             create_attach_accept,
@@ -29,4 +28,4 @@ class EventsFactory:
         for creator in self.events_creators:
             if (event := creator(pkt)) is not None:
                 event['time'] = datetime.fromtimestamp(float(pkt.frame_info.time_epoch))
-                self.callback(event)
+                return event

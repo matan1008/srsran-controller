@@ -1,6 +1,9 @@
+import datetime
+
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.gsm_sms_submit import create as create_gsm_sms_submit, GSM_SMS_SUBMIT_NAME
+from srsran_controller.uu_events.factory import EventsFactory
+from srsran_controller.uu_events.gsm_sms_submit import GSM_SMS_SUBMIT_NAME
 
 GSM_SMS_SUBMIT_PCAP_DATA = (
     '0a0d0d0ab80000004d3c2b1a01000000ffffffffffffffff02003500496e74656c28522920436f726528544d292069372d37373030204350'
@@ -29,7 +32,7 @@ def test_parsing_gsm_sms_submit(tmp_path):
     p = tmp_path / 'gsm_sms_submit.pcap'
     p.write_bytes(bytes.fromhex(GSM_SMS_SUBMIT_PCAP_DATA))
     pcap = FileCapture(str(p))
-    submit = create_gsm_sms_submit(list(pcap)[0])
+    submit = EventsFactory().from_packet(list(pcap)[0])
     assert submit == {
         'event': GSM_SMS_SUBMIT_NAME,
         'rp_da': '3548900076',
@@ -37,4 +40,5 @@ def test_parsing_gsm_sms_submit(tmp_path):
         'tp_da': '972543845166',
         'data': 'From: 972543845166\n Content: Do food',
         'rnti': 74,
+        'time': datetime.datetime(2021, 9, 1, 19, 40, 56, 27320),
     }

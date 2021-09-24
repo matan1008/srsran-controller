@@ -1,6 +1,9 @@
+import datetime
+
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.nas_emm_attach_accept import create as create_attach_accept, ATTACH_ACCEPT_NAME
+from srsran_controller.uu_events.factory import EventsFactory
+from srsran_controller.uu_events.nas_emm_attach_accept import ATTACH_ACCEPT_NAME
 
 ATTACH_ACCEPT_PCAP_DATA_IMSI = (
     '0a0d0d0ab80000004d3c2b1a01000000ffffffffffffffff02003600496e74656c28522920436f726528544d292069372d363730304b20435'
@@ -21,5 +24,10 @@ def test_parsing_emm_attach_accept(tmp_path):
     p = tmp_path / 'attach_accept.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_ACCEPT_PCAP_DATA_IMSI))
     pcap = FileCapture(str(p))
-    rar = create_attach_accept(list(pcap)[0])
-    assert rar == {'ip': '172.16.0.2', 'event': ATTACH_ACCEPT_NAME, 'rnti': 70}
+    rar = EventsFactory().from_packet(list(pcap)[0])
+    assert rar == {
+        'ip': '172.16.0.2',
+        'event': ATTACH_ACCEPT_NAME,
+        'rnti': 70,
+        'time': datetime.datetime(2021, 8, 20, 17, 16, 35, 111101),
+    }

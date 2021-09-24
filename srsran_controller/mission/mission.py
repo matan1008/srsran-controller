@@ -22,15 +22,13 @@ class Mission:
         self.ping_status_callback = lambda ping: None
         self.ping_log_callback = lambda ping, time, log: None
         self.channel_tracker = ChannelTracker()
-        self._events_factory = EventsFactory(self._handle_uu_event)
-        self._sniffer = UuSniffer(self._events_factory, lte_network.INTERFACE_NAME, lte_network.GATEWAY)
-        self._sniffing_task = asyncio.create_task(self._sniffer.start())
         self.epc = epc
         self.enb = enb
         self._lte_network = lte_network
         self._pgw_network = pgw_network
         self.pings = []
         self.start_time = datetime.now()
+        self._sniffing_task = asyncio.create_task(self._sniff_packets())
 
     async def ping(self, imsi: str) -> Ping:
         """
@@ -64,6 +62,15 @@ class Mission:
         self._lte_network.shutdown()
         if self._pgw_network is not None:
             self._pgw_network.shutdown()
+
+    async def _sniff_packets(self):
+        events_factory = EventsFactory()
+        sniffer = UuSniffer(self._lte_network.INTERFACE_NAME, self._lte_network.GATEWAY)
+        async for packet in sniffer.start():
+            event = events_factory.from_packet(packet)
+            if event is None:
+                continue
+            self._handle_uu_event(event)
 
     def _handle_uu_event(self, event):
         self.uu_events.append(event)

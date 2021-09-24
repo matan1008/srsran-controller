@@ -36,8 +36,7 @@ class AsyncLiveCapture(pyshark.LiveCapture):
 class UuSniffer:
     MAC_LTE_PORT = 5847
 
-    def __init__(self, parser, interface, addr, port=MAC_LTE_PORT):
-        self._parser = parser
+    def __init__(self, interface, addr, port=MAC_LTE_PORT):
         self._interface = interface
         self._addr = addr
         self._port = port
@@ -45,6 +44,7 @@ class UuSniffer:
     async def start(self):
         """
         Start tracking the Uu interface for new packets.
+        :rtype: types.AsyncGeneratorType
         """
         # The socket is required in order to prevent ICMP destination port unreachable from being sent.
         with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as sock:
@@ -52,9 +52,7 @@ class UuSniffer:
             try:
                 async with AsyncLiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface,
                                             eventloop=asyncio.get_event_loop()) as cap:
-                    gen = cap.sniff_continuously()
-                    while True:
-                        packet = await gen.__anext__()
-                        self._parser.from_packet(packet)
+                    async for packet in cap.sniff_continuously():
+                        yield packet
             except asyncio.CancelledError:
                 pass

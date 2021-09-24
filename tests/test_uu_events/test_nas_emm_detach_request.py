@@ -1,6 +1,8 @@
+import datetime
+
 from pyshark import FileCapture
 
-from srsran_controller.uu_events.nas_emm_detach_request import create as create_detach_request
+from srsran_controller.uu_events.factory import EventsFactory
 
 DETACH_REQUEST_PCAP_DATA = (
     'd4c3b2a1020004000000000000000000ffff0000950000001dcb8b604daf03003702000037020000beefdead023700006d61632d6c746501'
@@ -21,5 +23,10 @@ def test_parsing_emm_detach_request(tmp_path):
     p = tmp_path / 'detach_request.pcap'
     p.write_bytes(bytes.fromhex(DETACH_REQUEST_PCAP_DATA))
     pcap = FileCapture(str(p))
-    rar = create_detach_request(list(pcap)[0])
-    assert rar == {'tmsi': '0x1c1192e7', 'event': 'Detach request', 'rnti': 71}
+    rar = EventsFactory().from_packet(list(pcap)[0])
+    assert rar == {
+        'tmsi': '0x1c1192e7',
+        'event': 'Detach request',
+        'rnti': 71,
+        'time': datetime.datetime(2021, 4, 30, 12, 17, 17, 241485),
+    }
