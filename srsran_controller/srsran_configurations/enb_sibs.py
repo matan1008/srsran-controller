@@ -1,7 +1,9 @@
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, field
 from typing import TextIO
 
 import libconf
+
+from srsran_controller.common.dataclasses import to_dict_without_none
 
 __all__ = [
     'SrsEnbSib1SchedulerInfo', 'SrsEnbSib1', 'SrsEnbSib2RrRach', 'SrsEnbSib2RrBcch', 'SrsEnbSib2RrPcch',
@@ -9,7 +11,7 @@ __all__ = [
     'SrsEnbSib2RrPucch', 'SrsEnbSib2RrUlPwrCtrlDeltaFlistPucch', 'SrsEnbSib2RrUlPwrCtrl', 'SrsEnbSib2Rr',
     'SrsEnbSib2UeTimersAndConstants', 'SrsEnbSib2FreqInfo', 'SrsEnbSib2', 'SrsEnbSib3CellReselectionCommon',
     'SrsEnbSib3CellReselectionServing', 'SrsEnbSib3IntraFreqReselection', 'SrsEnbSib3', 'SrsEnbSib7CarrierFreqsInfo',
-    'SrsEnbSib7', 'SrsEnbSibs'
+    'SrsEnbSib7', 'SrsEnbSibs', 'SrsEnbSib4IntraFreqNeighCellInfo', 'SrsEnbSib4', 'SrsEnbPhysCellIdRange',
 ]
 
 
@@ -193,6 +195,25 @@ class SrsEnbSib3:
 
 
 @dataclass
+class SrsEnbSib4IntraFreqNeighCellInfo:
+    phys_cell_id: int
+    q_offset_range: int = 24
+
+
+@dataclass
+class SrsEnbPhysCellIdRange:
+    start: int
+    range: int
+
+
+@dataclass
+class SrsEnbSib4:
+    intra_freq_neigh_cell_list: tuple[SrsEnbSib4IntraFreqNeighCellInfo, ...] = field(default_factory=tuple)
+    intra_freq_black_cell_list: tuple[SrsEnbPhysCellIdRange, ...] = None
+    csg_phys_cell_id_range: SrsEnbPhysCellIdRange = None
+
+
+@dataclass
 class SrsEnbSib7CarrierFreqsInfo:
     cell_resel_prio: int = 7
     ncc_permitted: int = 255  # Allow all UEs to monitor this frequency.
@@ -217,7 +238,11 @@ class SrsEnbSibs:
     sib1: SrsEnbSib1 = field(default_factory=SrsEnbSib1)
     sib2: SrsEnbSib2 = field(default_factory=SrsEnbSib2)
     sib3: SrsEnbSib3 = field(default_factory=SrsEnbSib3)
-    sib7: SrsEnbSib7 = field(default_factory=SrsEnbSib7)
+    sib4: SrsEnbSib4 = None
+    sib7: SrsEnbSib7 = None
 
     def write(self, fd: TextIO):
-        libconf.dump(asdict(self), fd)
+        original_dict = to_dict_without_none(self)
+        if 'sib4' in original_dict:
+            original_dict['sib4'] = to_dict_without_none(self.sib4)
+        libconf.dump(original_dict, fd)

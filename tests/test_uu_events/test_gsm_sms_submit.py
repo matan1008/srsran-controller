@@ -31,8 +31,8 @@ GSM_SMS_SUBMIT_PCAP_DATA = (
 def test_parsing_gsm_sms_submit(tmp_path):
     p = tmp_path / 'gsm_sms_submit.pcap'
     p.write_bytes(bytes.fromhex(GSM_SMS_SUBMIT_PCAP_DATA))
-    pcap = FileCapture(str(p))
-    submit = EventsFactory().from_packet(list(pcap)[0])
+    with FileCapture(str(p)) as pcap:
+        submit = EventsFactory().from_packet(list(pcap)[0])
     assert submit == {
         'event': GSM_SMS_SUBMIT_NAME,
         'rp_da': '3548900076',

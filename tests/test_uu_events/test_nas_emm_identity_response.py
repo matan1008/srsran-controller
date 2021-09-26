@@ -30,9 +30,9 @@ IDENTITY_RESPONSE_PCAP_DATA_IMSI = (
 def test_parsing_emm_identity_response_imsi(tmp_path):
     p = tmp_path / 'identity_response_imsi.pcap'
     p.write_bytes(bytes.fromhex(IDENTITY_RESPONSE_PCAP_DATA_IMSI))
-    pcap = FileCapture(str(p))
-    rar = EventsFactory().from_packet(list(pcap)[0])
-    assert rar == {
+    with FileCapture(str(p)) as pcap:
+        id_response = EventsFactory().from_packet(list(pcap)[0])
+    assert id_response == {
         'imsi': '001010123456789',
         'event': IDENTITY_RESPONSE_NAME,
         'rnti': 74,

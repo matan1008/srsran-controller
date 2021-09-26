@@ -3,15 +3,13 @@ from typing import TextIO
 
 import libconf
 
+from srsran_controller.common.dataclasses import to_dict_without_none
+
 __all__ = [
     'SrsEnbDrbQciConfigPdcpConfig', 'SrsEnbDrbQciConfigRlcConfigUlUm', 'SrsEnbDrbQciConfigRlcConfigDlUm',
     'SrsEnbDrbQciConfigRlcConfigUlAm', 'SrsEnbDrbQciConfigRlcConfigDlAm', 'SrsEnbDrbQciConfigRlcConfig',
     'SrsEnbDrbQciConfigLogicalChannelConfig', 'SrsEnbDrbQciConfig', 'SrsEnbDrbs'
 ]
-
-
-def to_dict(dataclass_object):
-    return {k: v for k, v in asdict(dataclass_object).items() if v is not None}
 
 
 @dataclass
@@ -71,8 +69,8 @@ class SrsEnbDrbQciConfig:
 
     def to_dict(self):
         original_dict = asdict(self)
-        original_dict['pdcp_config'] = to_dict(self.pdcp_config)
-        original_dict['rlc_config'] = to_dict(self.rlc_config)
+        original_dict['pdcp_config'] = to_dict_without_none(self.pdcp_config)
+        original_dict['rlc_config'] = to_dict_without_none(self.rlc_config)
         return original_dict
 
 

@@ -23,9 +23,9 @@ ATTACH_ACCEPT_PCAP_DATA_IMSI = (
 def test_parsing_emm_attach_accept(tmp_path):
     p = tmp_path / 'attach_accept.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_ACCEPT_PCAP_DATA_IMSI))
-    pcap = FileCapture(str(p))
-    rar = EventsFactory().from_packet(list(pcap)[0])
-    assert rar == {
+    with FileCapture(str(p)) as pcap:
+        attach_accept = EventsFactory().from_packet(list(pcap)[0])
+    assert attach_accept == {
         'ip': '172.16.0.2',
         'event': ATTACH_ACCEPT_NAME,
         'rnti': 70,
