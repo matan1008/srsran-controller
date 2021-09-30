@@ -1,13 +1,17 @@
+from logging import Logger, getLogger
+
 import docker
 from docker.errors import APIError
 
 
 class Entity:
-    def __init__(self, container):
+    def __init__(self, container, logger: Logger = getLogger('srsran_controller')):
         """
         :param docker.models.containers.Container container: Docker container to wrap.
+        :param logger: Logger.
         """
         self._container = container
+        self.logger = logger
 
     def start(self):
         """

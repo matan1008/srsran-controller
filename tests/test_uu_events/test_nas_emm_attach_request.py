@@ -24,7 +24,7 @@ def test_parsing_emm_attach_request(tmp_path):
     p = tmp_path / 'attach_request.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_REQUEST_PCAP_DATA))
     with FileCapture(str(p)) as pcap:
-        attach_request = EventsFactory().from_packet(list(pcap)[0])
+        attach_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_request == {
         'imsi': '001010123456789',
         'event': ATTACH_REQUEST_NAME,

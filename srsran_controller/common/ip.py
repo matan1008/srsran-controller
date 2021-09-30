@@ -1,3 +1,5 @@
+import netifaces
+
 from srsran_controller.common.utils import run_as_sudo
 
 
@@ -27,3 +29,10 @@ def construct_forward(from_, to):
 def forward_interfaces(from_, to, password):
     for iptable_command in construct_forward(from_, to):
         run_as_sudo(iptable_command, password)
+
+
+def find_interface_of_address(ip_address):
+    for interface in netifaces.interfaces():
+        for addr in netifaces.ifaddresses(interface)[netifaces.AF_INET]:
+            if addr['addr'] == ip_address:
+                return interface

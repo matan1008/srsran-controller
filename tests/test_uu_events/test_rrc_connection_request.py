@@ -15,7 +15,7 @@ def test_parsing_connection_request_with_tmsi(tmp_path):
     p = tmp_path / 'rrc_connection_request.pcap'
     p.write_bytes(bytes.fromhex(RRC_CONNECTION_REQUEST_PCAP_DATA))
     with FileCapture(str(p)) as pcap:
-        connection_request = EventsFactory().from_packet(list(pcap)[0])
+        connection_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert connection_request == {
         'event': CONNECTION_REQUEST_NAME,
         'tmsi': '1c1192e7',

@@ -1,7 +1,7 @@
 import docker
 
 from srsran_controller.configuration import config
-from srsran_controller.mission.entity import Entity
+from srsran_controller.common.docker.entity import Entity
 
 
 class Enb(Entity):

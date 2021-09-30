@@ -2,7 +2,7 @@ import docker
 
 from srsran_controller.common.ip import construct_forward
 from srsran_controller.configuration import config
-from srsran_controller.mission.entity import Entity
+from srsran_controller.common.docker.entity import Entity
 
 
 class Epc(Entity):
