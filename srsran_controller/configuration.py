@@ -13,9 +13,11 @@ class Configuration:
     current_enb_sibs_configuration: str
     current_enb_drbs_configuration: str
     current_enb_rr_configuration: str
+    current_ue_configuration: str
     users_db: str
     epc_docker_image: str = 'srsran-controller-docker:latest'
     enb_docker_image: str = 'srsran-controller-docker:latest'
+    scanner_docker_image: str = 'srsran-controller-docker:latest'
     sudo_password: str = ''  # Never save it in a json, required for run time only.
 
     def reload(self, path: str):
@@ -38,5 +40,6 @@ config = Configuration(
     current_enb_sibs_configuration='',
     current_enb_drbs_configuration='',
     current_enb_rr_configuration='',
+    current_ue_configuration='',
     users_db='',
 )

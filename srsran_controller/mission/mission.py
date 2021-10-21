@@ -3,7 +3,7 @@ from datetime import datetime
 
 from srsran_controller.mission.channel_tracker import ChannelTracker
 from srsran_controller.mission.ping import Ping
-from srsran_controller.mission.uu_sniffer import UuSniffer
+from srsran_controller.uu_events.uu_sniffer import UuSniffer
 from srsran_controller.uu_events.factory import EventsFactory
 
 
@@ -67,10 +67,8 @@ class Mission:
         events_factory = EventsFactory()
         sniffer = UuSniffer(self._lte_network.INTERFACE_NAME, self._lte_network.GATEWAY)
         async for packet in sniffer.start():
-            event = events_factory.from_packet(packet)
-            if event is None:
-                continue
-            self._handle_uu_event(event)
+            for event in events_factory.from_packet(packet):
+                self._handle_uu_event(event)
 
     def _handle_uu_event(self, event):
         self.uu_events.append(event)

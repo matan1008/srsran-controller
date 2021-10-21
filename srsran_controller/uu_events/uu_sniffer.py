@@ -41,7 +41,7 @@ class UuSniffer:
         self._addr = addr
         self._port = port
 
-    async def start(self):
+    async def start(self, use_json: bool = False):
         """
         Start tracking the Uu interface for new packets.
         :rtype: types.AsyncGeneratorType
@@ -51,7 +51,7 @@ class UuSniffer:
             sock.bind((self._addr, self._port))
             try:
                 async with AsyncLiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface,
-                                            eventloop=asyncio.get_event_loop()) as cap:
+                                            eventloop=asyncio.get_event_loop(), use_json=use_json) as cap:
                     async for packet in cap.sniff_continuously():
                         yield packet
             except asyncio.CancelledError:

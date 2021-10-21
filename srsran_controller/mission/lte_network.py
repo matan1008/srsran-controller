@@ -1,4 +1,4 @@
-from srsran_controller.mission.network import Network
+from srsran_controller.common.docker.network import Network
 
 
 class LteNetwork(Network):

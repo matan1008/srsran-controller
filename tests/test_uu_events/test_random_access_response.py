@@ -15,7 +15,7 @@ def test_parsing_random_access_response(tmp_path):
     p = tmp_path / 'random_access_response.pcap'
     p.write_bytes(bytes.fromhex(RAR_PCAP_DATA))
     with FileCapture(str(p)) as pcap:
-        rar = EventsFactory().from_packet(list(pcap)[0])
+        rar = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert rar == {
         'event': RA_RESPONSE_NAME,
         'ta': 5,
