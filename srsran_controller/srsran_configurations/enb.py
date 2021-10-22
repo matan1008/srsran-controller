@@ -16,7 +16,7 @@ class SrsEnbEnbConfiguration:
     mme_addr: str
     gtp_bind_addr: str
     s1c_bind_addr: str
-    n_prb: int = 50
+    n_prb: int = 100
 
 
 @dataclass
