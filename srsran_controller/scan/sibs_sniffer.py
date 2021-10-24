@@ -22,7 +22,7 @@ class SibsScanner(Entity):
         client = docker.from_env()
         volumes = {configuration_path: {'bind': SibsScanner.CONF_CONTAINER_PATH, 'mode': 'ro'}}
         container = client.containers.create(
-            config.scanner_docker_image, SibsScanner.COMMAND, auto_remove=True,
+            config.scanner_docker_image, SibsScanner.COMMAND, auto_remove=True, nano_cpus=1000000000,
             name=SibsScanner.CONTAINER_NAME, network_mode='host', privileged=True, volumes=volumes
         )
         scanner = SibsScanner(container)
