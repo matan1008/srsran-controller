@@ -8,6 +8,7 @@ from srsran_controller.uu_events.nas_emm_detach_request import create as create_
 from srsran_controller.uu_events.nas_emm_identity_response import create as create_identity_response
 from srsran_controller.uu_events.nas_emm_security_mode_complete import create as create_security_mode_complete
 from srsran_controller.uu_events.random_access_response import create as create_ra_response
+from srsran_controller.uu_events.rrc_connection_reestablishment_request import create as create_rrc_conn_reest_req
 from srsran_controller.uu_events.rrc_connection_request import create as create_rrc_conn_request
 from srsran_controller.uu_events.system_information_block_1 import create as create_sib1
 from srsran_controller.uu_events.system_information_block_2 import create as create_sib2
@@ -29,6 +30,7 @@ class EventsFactory:
             create_identity_response,
             create_security_mode_complete,
             create_ra_response,
+            create_rrc_conn_reest_req,
             create_rrc_conn_request,
             create_sib1,
             create_sib2,

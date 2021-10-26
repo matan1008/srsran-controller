@@ -5,6 +5,7 @@ from srsran_controller.uu_events.nas_emm_attach_request import ATTACH_REQUEST_NA
 from srsran_controller.uu_events.nas_emm_identity_response import IDENTITY_RESPONSE_NAME
 from srsran_controller.uu_events.nas_emm_security_mode_complete import SECURITY_MODE_COMPLETE_NAME
 from srsran_controller.uu_events.random_access_response import RA_RESPONSE_NAME
+from srsran_controller.uu_events.rrc_connection_reestablishment_request import CONNECTION_REESTABLISHMEMT_REQUEST_NAME
 from srsran_controller.uu_events.rrc_connection_request import CONNECTION_REQUEST_NAME
 
 
@@ -26,6 +27,7 @@ class ChannelTracker:
             RA_RESPONSE_NAME: self._handle_rar,
             CONNECTION_REQUEST_NAME: self._handle_connection_request,
             IDENTITY_RESPONSE_NAME: self._handle_identity_response,
+            CONNECTION_REESTABLISHMEMT_REQUEST_NAME: self._handle_connection_reesttablishment_request,
         }
 
     def imsi_to_ip(self, imsi: str) -> str:
@@ -84,3 +86,6 @@ class ChannelTracker:
     def _handle_identity_response(self, event: dict):
         if 'imsi' in event:
             self._rnti_channels[event['rnti']].imsi = event['imsi']
+
+    def _handle_connection_reesttablishment_request(self, event: dict):
+        self._rnti_channels[event['rnti']] = self._rnti_channels.pop(event['c-rnti'])
