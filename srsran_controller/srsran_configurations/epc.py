@@ -23,6 +23,7 @@ class SrsEpcMmeConfiguration:
     encryption_algo: str = 'EEA0'
     integrity_algo: str = 'EIA1'
     paging_timer: int = 2
+    request_imeisv: bool = True
 
 
 @dataclass
