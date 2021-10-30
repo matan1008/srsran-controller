@@ -10,7 +10,7 @@ def test_sanity():
             enb_id=0x19B, mcc='001', mnc='01', mme_addr='127.0.1.100', gtp_bind_addr='127.0.1.1',
             s1c_bind_addr='127.0.1.1', n_prb=50
         ),
-        enb_files=SrsEnbEnbFilesConfiguration(sib_config='sib.conf', rr_config='rr.conf', drb_config='drb.conf'),
+        enb_files=SrsEnbEnbFilesConfiguration(sib_config='sib.conf', rr_config='rr.conf', rb_config='rb.conf'),
         rf=SrsEnbRfConfiguration(),
         pcap=SrsEnbPcapConfiguration(enable=False, filename='/tmp/enb.pcap', s1ap_enable=False,
                                      s1ap_filename='/tmp/enb_s1ap.pcap'),
@@ -29,7 +29,7 @@ def test_sanity():
         '[enb_files]\n'
         'sib_config = sib.conf\n'
         'rr_config = rr.conf\n'
-        'drb_config = drb.conf\n'
+        'rb_config = rb.conf\n'
         '\n'
         '[rf]\n'
         'device_name = auto\n'
@@ -74,7 +74,7 @@ def test_log_all():
             enb_id=0x19B, mcc='001', mnc='01', mme_addr='127.0.1.100', gtp_bind_addr='127.0.1.1',
             s1c_bind_addr='127.0.1.1', n_prb=50
         ),
-        enb_files=SrsEnbEnbFilesConfiguration(sib_config='sib.conf', rr_config='rr.conf', drb_config='drb.conf'),
+        enb_files=SrsEnbEnbFilesConfiguration(sib_config='sib.conf', rr_config='rr.conf', rb_config='rb.conf'),
         rf=SrsEnbRfConfiguration(),
         pcap=SrsEnbPcapConfiguration(enable=False, filename='/tmp/enb.pcap', s1ap_enable=False,
                                      s1ap_filename='/tmp/enb_s1ap.pcap'),
@@ -93,7 +93,7 @@ def test_log_all():
         '[enb_files]\n'
         'sib_config = sib.conf\n'
         'rr_config = rr.conf\n'
-        'drb_config = drb.conf\n'
+        'rb_config = rb.conf\n'
         '\n'
         '[rf]\n'
         'device_name = auto\n'

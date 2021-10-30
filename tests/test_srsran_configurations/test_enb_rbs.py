@@ -1,29 +1,29 @@
-from srsran_controller.srsran_configurations.enb_drbs import *
+from srsran_controller.srsran_configurations.enb_rbs import *
 from io import StringIO
 
 
 def test_sanity():
     output = StringIO()
-    SrsEnbDrbs(qci_config=(
-        SrsEnbDrbQciConfig(
+    SrsEnbRbs(qci_config=(
+        SrsEnbRbQciConfig(
             qci=7,
-            pdcp_config=SrsEnbDrbQciConfigPdcpConfig(discard_timer=100, pdcp_sn_size=12),
-            rlc_config=SrsEnbDrbQciConfigRlcConfig(
-                ul_um=SrsEnbDrbQciConfigRlcConfigUlUm(sn_field_length=10),
-                dl_um=SrsEnbDrbQciConfigRlcConfigDlUm(sn_field_length=10, t_reordering=45)
+            pdcp_config=SrsEnbRbQciConfigPdcpConfig(discard_timer=100, pdcp_sn_size=12),
+            rlc_config=SrsEnbRbQciConfigRlcConfig(
+                ul_um=SrsEnbRbQciConfigRlcConfigUlUm(sn_field_length=10),
+                dl_um=SrsEnbRbQciConfigRlcConfigDlUm(sn_field_length=10, t_reordering=45)
             ),
-            logical_channel_config=SrsEnbDrbQciConfigLogicalChannelConfig(
+            logical_channel_config=SrsEnbRbQciConfigLogicalChannelConfig(
                 priority=13, prioritized_bit_rate=-1, bucket_size_duration=100, log_chan_group=2
             )
         ),
-        SrsEnbDrbQciConfig(
+        SrsEnbRbQciConfig(
             qci=9,
-            pdcp_config=SrsEnbDrbQciConfigPdcpConfig(discard_timer=-1, status_report_required=True),
-            rlc_config=SrsEnbDrbQciConfigRlcConfig(
-                ul_am=SrsEnbDrbQciConfigRlcConfigUlAm(t_poll_retx=120, poll_pdu=64, poll_byte=750, max_retx_thresh=16),
-                dl_am=SrsEnbDrbQciConfigRlcConfigDlAm(t_reordering=50, t_status_prohibit=50)
+            pdcp_config=SrsEnbRbQciConfigPdcpConfig(discard_timer=-1, status_report_required=True),
+            rlc_config=SrsEnbRbQciConfigRlcConfig(
+                ul_am=SrsEnbRbQciConfigRlcConfigUlAm(t_poll_retx=120, poll_pdu=64, poll_byte=750, max_retx_thresh=16),
+                dl_am=SrsEnbRbQciConfigRlcConfigDlAm(t_reordering=50, t_status_prohibit=50)
             ),
-            logical_channel_config=SrsEnbDrbQciConfigLogicalChannelConfig(
+            logical_channel_config=SrsEnbRbQciConfigLogicalChannelConfig(
                 priority=11, prioritized_bit_rate=-1, bucket_size_duration=100, log_chan_group=3
             )
         ),

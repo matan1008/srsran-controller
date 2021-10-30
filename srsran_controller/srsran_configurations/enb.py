@@ -23,7 +23,7 @@ class SrsEnbEnbConfiguration:
 class SrsEnbEnbFilesConfiguration:
     sib_config: str
     rr_config: str
-    drb_config: str
+    rb_config: str
 
 
 @dataclass

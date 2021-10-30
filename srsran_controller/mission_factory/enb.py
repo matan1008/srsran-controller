@@ -2,7 +2,7 @@ from srsran_controller.configuration import config
 from srsran_controller.mission.enb import Enb
 from srsran_controller.mission.lte_network import LteNetwork
 from srsran_controller.srsran_configurations.enb import *
-from srsran_controller.srsran_configurations.enb_drbs import *
+from srsran_controller.srsran_configurations.enb_rbs import *
 from srsran_controller.srsran_configurations.enb_rr import *
 from srsran_controller.srsran_configurations.enb_sibs import *
 
@@ -17,28 +17,28 @@ def build_sibs(conf):
     return SrsEnbSibs(sib7=SrsEnbSib7(carrier_freqs_info_list=gsm_neighbors))
 
 
-def build_drbs():
-    return SrsEnbDrbs(qci_config=(
-        SrsEnbDrbQciConfig(
+def build_rbs():
+    return SrsEnbRbs(qci_config=(
+        SrsEnbRbQciConfig(
             qci=7,
-            pdcp_config=SrsEnbDrbQciConfigPdcpConfig(discard_timer=100, pdcp_sn_size=12),
-            rlc_config=SrsEnbDrbQciConfigRlcConfig(
-                ul_um=SrsEnbDrbQciConfigRlcConfigUlUm(sn_field_length=10),
-                dl_um=SrsEnbDrbQciConfigRlcConfigDlUm(sn_field_length=10, t_reordering=45)
+            pdcp_config=SrsEnbRbQciConfigPdcpConfig(discard_timer=100, pdcp_sn_size=12),
+            rlc_config=SrsEnbRbQciConfigRlcConfig(
+                ul_um=SrsEnbRbQciConfigRlcConfigUlUm(sn_field_length=10),
+                dl_um=SrsEnbRbQciConfigRlcConfigDlUm(sn_field_length=10, t_reordering=45)
             ),
-            logical_channel_config=SrsEnbDrbQciConfigLogicalChannelConfig(
+            logical_channel_config=SrsEnbRbQciConfigLogicalChannelConfig(
                 priority=13, prioritized_bit_rate=-1, bucket_size_duration=100, log_chan_group=2
             )
         ),
-        SrsEnbDrbQciConfig(
+        SrsEnbRbQciConfig(
             qci=9,
-            pdcp_config=SrsEnbDrbQciConfigPdcpConfig(discard_timer=-1, status_report_required=True),
-            rlc_config=SrsEnbDrbQciConfigRlcConfig(
-                ul_am=SrsEnbDrbQciConfigRlcConfigUlAm(t_poll_retx=120, poll_pdu=64, poll_byte=750,
+            pdcp_config=SrsEnbRbQciConfigPdcpConfig(discard_timer=-1, status_report_required=True),
+            rlc_config=SrsEnbRbQciConfigRlcConfig(
+                ul_am=SrsEnbRbQciConfigRlcConfigUlAm(t_poll_retx=120, poll_pdu=64, poll_byte=750,
                                                       max_retx_thresh=16),
-                dl_am=SrsEnbDrbQciConfigRlcConfigDlAm(t_reordering=50, t_status_prohibit=50)
+                dl_am=SrsEnbRbQciConfigRlcConfigDlAm(t_reordering=50, t_status_prohibit=50)
             ),
-            logical_channel_config=SrsEnbDrbQciConfigLogicalChannelConfig(
+            logical_channel_config=SrsEnbRbQciConfigLogicalChannelConfig(
                 priority=11, prioritized_bit_rate=-1, bucket_size_duration=100, log_chan_group=3
             )
         ),
@@ -81,7 +81,7 @@ def build_configuration(conf, epc_ip, enb_ip):
         ),
         enb_files=SrsEnbEnbFilesConfiguration(sib_config=Enb.SIBS_CONF_CONTAINER_PATH,
                                               rr_config=Enb.RR_CONF_CONTAINER_PATH,
-                                              drb_config=Enb.DRBS_CONF_CONTAINER_PATH),
+                                              rb_config=Enb.RBS_CONF_CONTAINER_PATH),
         rf=build_rf_configuration(conf),
         pcap=SrsEnbPcapConfiguration(mac_net_enable=True, client_ip=LteNetwork.GATEWAY),
         log=SrsEnbLogConfiguration(filename=Enb.LOG_CONTAINER_PATH, all_level='debug')
@@ -99,15 +99,15 @@ def create(conf, lte_network, epc_ip, enb_ip):
     """
     with open(config.current_enb_sibs_configuration, 'w') as fd:
         build_sibs(conf).write(fd)
-    with open(config.current_enb_drbs_configuration, 'w') as fd:
-        build_drbs().write(fd)
+    with open(config.current_enb_rbs_configuration, 'w') as fd:
+        build_rbs().write(fd)
     with open(config.current_enb_rr_configuration, 'w') as fd:
         build_rr(conf).write(fd)
     with open(config.current_enb_configuration, 'w') as fd:
         build_configuration(conf, epc_ip, enb_ip).write(fd)
     enb = Enb.create(
         config.current_enb_configuration, config.current_enb_sibs_configuration,
-        config.current_enb_drbs_configuration, config.current_enb_rr_configuration
+        config.current_enb_rbs_configuration, config.current_enb_rr_configuration
     )
     enb.connect(lte_network, enb_ip)
     enb.start()
