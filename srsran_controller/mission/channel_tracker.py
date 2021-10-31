@@ -73,7 +73,8 @@ class ChannelTracker:
         self._rnti_channels[event['rnti']].ip = event['ip']
 
     def _handle_attach_request(self, event: dict):
-        self._rnti_channels[event['rnti']].imsi = event['imsi']
+        if 'imsi' in event:
+            self._rnti_channels[event['rnti']].imsi = event['imsi']
 
     def _handle_security_mode_complete(self, event: dict):
         if 'imeisv' in event:
