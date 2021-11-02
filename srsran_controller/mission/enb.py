@@ -10,7 +10,6 @@ class Enb(Entity):
     SIBS_CONF_CONTAINER_PATH = '/mnt/enb_sibs.conf'
     RBS_CONF_CONTAINER_PATH = '/mnt/enb_rbs.conf'
     RR_CONF_CONTAINER_PATH = '/mnt/enb_rr.conf'
-    CAP_CONTAINER_PATH = '/tmp/enb.pcap'
     COMMAND = f'srsenb {CONF_CONTAINER_PATH}'
     LOG_CONTAINER_PATH = '/tmp/enb.log'
 
@@ -29,6 +28,7 @@ class Enb(Entity):
             sibs_path: {'bind': Enb.SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rbs_path: {'bind': Enb.RBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rr_path: {'bind': Enb.RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
+            # '/home/matan/alligator/logs': {'bind': '/tmp', 'mode': 'rw'},
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,
