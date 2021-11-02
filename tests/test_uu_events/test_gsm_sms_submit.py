@@ -35,10 +35,11 @@ def test_parsing_gsm_sms_submit(tmp_path):
         submit = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert submit == {
         'event': GSM_SMS_SUBMIT_NAME,
-        'rp_da': '3548900076',
-        'content': 'Do food',
-        'tp_da': '972543845166',
-        'data': 'From: 972543845166\n Content: Do food',
+        'data': {
+            'rp_da': '3548900076',
+            'content': 'Do food',
+            'tp_da': '972543845166',
+        },
         'rnti': 74,
         'time': datetime.datetime(2021, 9, 1, 19, 40, 56, 27320),
     }
