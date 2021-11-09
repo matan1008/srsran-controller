@@ -28,7 +28,6 @@ class Enb(Entity):
             sibs_path: {'bind': Enb.SIBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rbs_path: {'bind': Enb.RBS_CONF_CONTAINER_PATH, 'mode': 'ro'},
             rr_path: {'bind': Enb.RR_CONF_CONTAINER_PATH, 'mode': 'ro'},
-            # '/home/matan/alligator/logs': {'bind': '/tmp', 'mode': 'rw'},
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,
