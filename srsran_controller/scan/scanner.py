@@ -1,9 +1,13 @@
 import asyncio
+import json
 from contextlib import contextmanager
+from datetime import datetime
 from logging import Logger, getLogger
+from pathlib import Path
 from typing import AsyncGenerator
 
 from srsran_controller.common.ip import find_interface_of_address
+from srsran_controller.configuration import config
 from srsran_controller.scan.sibs_sniffer import create_sibs_sniffer, SibsScanner
 from srsran_controller.scan.sync_signal_scanner import SyncSignalScanner
 from srsran_controller.uu_events.factory import EventsFactory
@@ -58,16 +62,18 @@ class Scanner:
         """
         self.logger.info(f'Scanning cell earfcn {earfcn}, cell_id {cell_id}')
         sibs = {}
+        raw_sibs = []
         with self._run_cell_sniffer(earfcn, cell_id):
             sniffer = UuSniffer(find_interface_of_address(SibsScanner.CLIENT_IP), SibsScanner.CLIENT_IP)
             packet_generator = sniffer.start(use_json=True)
             try:
-                await asyncio.wait_for(self._sniff_cell_sibs(packet_generator, sibs), self.SIBS_SCAN_TIMEOUT)
+                await asyncio.wait_for(self._sniff_cell_sibs(packet_generator, sibs, raw_sibs), self.SIBS_SCAN_TIMEOUT)
             except asyncio.TimeoutError:
                 self.logger.warning(f'Could not scan all sibs of cell')
             finally:
                 await packet_generator.aclose()
 
+        self._dump_scan(sibs, raw_sibs, earfcn, cell_id)
         self.last_cells_scan[earfcn, cell_id] = sibs
         return sibs
 
@@ -94,12 +100,27 @@ class Scanner:
         finally:
             sibs_sniffer.shutdown()
 
-    async def _sniff_cell_sibs(self, packet_generator: AsyncGenerator, sibs: dict):
+    async def _sniff_cell_sibs(self, packet_generator: AsyncGenerator, sibs: dict, raw_packets: list):
         events_factory = EventsFactory()
         async for packet in packet_generator:
+            if 'mac-lte' in packet:
+                raw_packets.append(packet['mac-lte']._all_fields)
             for event in events_factory.from_packet(packet):
                 if event['event'] not in SIB_NAMES:
                     continue
                 sibs[SIB_NAMES[event['event']]] = event['data']
             if 1 in sibs and all(sib in sibs for sib in sibs[1]['scheduled_sibs']):
                 break
+
+    def _dump_scan(self, sibs, raw_sibs, earfcn, cell_id):
+        if not config.scan_results:
+            return
+        scan_dir = Path(config.scan_results)
+        scan_dir.mkdir(parents=True, exist_ok=True)
+        name_base = f'{datetime.now().timestamp()}_{earfcn}_{cell_id}'
+        sib_path = scan_dir / (name_base + '.json')
+        self.logger.debug(f'Writing scan results to {sib_path.absolute()}')
+        with open(scan_dir / (name_base + '.raw.json'), 'w') as fd:
+            json.dump(raw_sibs, fd, indent=4)
+        with open(sib_path, 'w') as fd:
+            json.dump(sibs, fd, indent=4)

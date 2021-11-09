@@ -15,6 +15,7 @@ class Configuration:
     current_enb_rr_configuration: str
     current_ue_configuration: str
     users_db: str
+    scan_results: str
     epc_docker_image: str = 'srsran-controller-docker:latest'
     enb_docker_image: str = 'srsran-controller-docker:latest'
     scanner_docker_image: str = 'srsran-controller-docker:latest'
@@ -42,4 +43,5 @@ config = Configuration(
     current_enb_rr_configuration='',
     current_ue_configuration='',
     users_db='',
+    scan_results='',
 )
