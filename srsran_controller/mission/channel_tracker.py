@@ -71,22 +71,29 @@ class ChannelTracker:
 
     def _handle_attach_accept(self, event: dict):
         self._rnti_channels[event['rnti']].ip = event['ip']
+        self._set_imsi(event)
 
     def _handle_attach_request(self, event: dict):
-        if 'imsi' in event:
-            self._rnti_channels[event['rnti']].imsi = event['imsi']
+        self._set_imsi(event)
 
     def _handle_security_mode_complete(self, event: dict):
         if 'imeisv' in event:
             self._rnti_channels[event['rnti']].imeisv = event['imeisv']
 
     def _handle_connection_request(self, event: dict):
-        if 'imsi' in event:
-            self._rnti_channels[event['rnti']].imsi = event['imsi']
+        self._set_imsi(event)
 
     def _handle_identity_response(self, event: dict):
-        if 'imsi' in event:
-            self._rnti_channels[event['rnti']].imsi = event['imsi']
+        self._set_imsi(event)
 
     def _handle_connection_reesttablishment_request(self, event: dict):
         self._rnti_channels[event['rnti']] = self._rnti_channels.pop(event['c-rnti'])
+
+    def _set_imsi(self, event: dict):
+        if 'imsi' not in event:
+            return
+        self._rnti_channels[event['rnti']].imsi = event['imsi']
+        # Remove old channels related to this imsi.
+        for old_rnti in list(self._rnti_channels.keys()):
+            if self._rnti_channels[old_rnti].imsi == event['imsi'] and old_rnti != event['rnti']:
+                del self._rnti_channels[old_rnti]
