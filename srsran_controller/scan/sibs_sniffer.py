@@ -39,7 +39,7 @@ def _build_ue_configuration(earfcn, cell_id, client_ip):
             imsi='1' * 15,
             imei='3' * 15,
         ),
-        phy=SrsUePhyConfiguration(force_N_id_2=cell_id % 3)
+        phy=SrsUePhyConfiguration(force_N_id_2=cell_id % 3, force_N_id_1=cell_id // 3)
     )
 
 

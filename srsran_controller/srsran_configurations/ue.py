@@ -82,6 +82,7 @@ class SrsUePhyConfiguration:
     in_sync_snr_db_th: float = -10.0
     nof_out_of_sync_events: int = 40
     force_N_id_2: int = -1
+    force_N_id_1: int = -1
 
 
 @dataclass
