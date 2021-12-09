@@ -1,17 +1,26 @@
+from contextlib import contextmanager
+
 import pytest
 
 from srsran_controller.configuration import config
 from srsran_controller.subscribers_manager import SubscribersManager, Subscriber
 
 
-@pytest.fixture(scope='function', autouse=True)
-def users_db_file(tmp_path):
+@contextmanager
+def change_users_db(new_users_db):
     old_users = config.users_db
-    config.users_db = (tmp_path / 'new_db.csv').absolute()
+    config.users_db = new_users_db
     try:
-        yield config.users_db
+        yield
     finally:
         config.users_db = old_users
+
+
+@pytest.fixture(scope='function', autouse=True)
+def users_db_file(tmp_path):
+    new_users_db = (tmp_path / 'new_db.csv').absolute()
+    with change_users_db(new_users_db):
+        yield new_users_db
 
 
 def test_adding_subscribers(users_db_file):
@@ -84,3 +93,9 @@ def test_editing_subscribers(users_db_file):
         'Name2,mil,001010123456783,00112233445566778899aabbccddeeff,opc,63bfa50ee6523365ff14c1f45f88737d,9001,'
         '0000000004d1,9,dynamic\n'
     )
+
+
+def test_iterating_subscribers_missing_file():
+    with change_users_db('users_db_that_doesnt_exist'):
+        s = SubscribersManager()
+        assert not list(s.iter_subscribers())

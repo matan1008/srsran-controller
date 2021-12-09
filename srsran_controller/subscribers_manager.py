@@ -1,5 +1,6 @@
 import csv
 from dataclasses import dataclass
+from pathlib import Path
 
 from srsran_controller.configuration import config
 
@@ -57,6 +58,8 @@ class SubscribersManager:
 
     @staticmethod
     def _iter_db_lines():
+        if not Path(config.users_db).exists():
+            return
         with open(config.users_db) as subscribers_file:
             reader = csv.reader(filter(lambda line: line[0] != '#', subscribers_file))
             for row in reader:
