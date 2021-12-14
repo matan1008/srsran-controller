@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import pathlib
 
@@ -21,7 +22,7 @@ class SrsranController:
         self.subscribers = SubscribersManager()
         self.scanner = Scanner()
         self._current_mission = None
-        self.is_scanning = False
+        self._scanning_task = None  # type: asyncio.Task | None
 
     @property
     def current_mission(self) -> Mission:
@@ -62,24 +63,26 @@ class SrsranController:
         self._current_mission = None
         self.logger.debug('Mission stopped successfully')
 
-    async def scan(self, band: int, device_name='UHD', device_args=''):
+    async def scan(self, band: int, device_name: str = 'UHD', device_args: str = ''):
         """
-        Scan all cell in a given band.
+        Start scanning all cells in a given band.
         :param band: Band to scan.
         :param device_name: RF device type to use.
         :param device_args: Device specific arguments.
         """
-        self.logger.info(f'Scanning band {band}')
-
-        if self.is_scanning:
+        if self.scanner.is_scanning:
             self.logger.warning('A scan is already running')
             raise exceptions.ScanAlreadyRunningError()
+        self._scanning_task = asyncio.create_task(self.scanner.scan(band, device_name, device_args))
 
-        self.is_scanning = True
+    async def stop_scanning(self):
+        self.logger.info('Stopping current scan')
+        if self._scanning_task is None or not self.scanner.is_scanning:
+            self.logger.warning('Scan is not running')
+            raise exceptions.ScanIsNotRunningError()
+        self._scanning_task.cancel()
         try:
-            cells = await self.scanner.scan_sync_signal(band, device_name, device_args)
-            for cell in cells:
-                await self.scanner.scan_cell(cell['earfcn'], cell['cell_id'])
-            return cells
-        finally:
-            self.is_scanning = False
+            await self._scanning_task
+        except asyncio.CancelledError:
+            pass
+        self.logger.debug('Scan stopped successfully')

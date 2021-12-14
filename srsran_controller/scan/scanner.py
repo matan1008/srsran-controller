@@ -2,6 +2,7 @@ import asyncio
 import json
 from contextlib import contextmanager
 from datetime import datetime
+from enum import Enum, auto
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import AsyncGenerator
@@ -31,6 +32,12 @@ SIB_NAMES = {
 }
 
 
+class ScanState(Enum):
+    NONE = auto()
+    SIGNALS = auto()
+    SIBS = auto()
+
+
 class Scanner:
     SIBS_SCAN_TIMEOUT = 60
 
@@ -38,6 +45,32 @@ class Scanner:
         self.last_sync_signals_scan = {}
         self.last_cells_scan = {}
         self.logger = logger
+        self.scan_state = ScanState.NONE
+        self.progress = (100, 100)
+        self.scan_progress_callback = lambda scanner: None
+
+    @property
+    def is_scanning(self):
+        return self.scan_state != ScanState.NONE
+
+    async def scan(self, band: int, device_name: str = 'UHD', device_args: str = ''):
+        """
+        Scan all cells in a given band.
+        :param band: Band to scan.
+        :param device_name: RF device type to use.
+        :param device_args: Device specific arguments.
+        """
+        self.logger.info(f'Scanning band {band}')
+
+        self._handle_scan_progress(0, 0, ScanState.SIGNALS)
+        try:
+            cells = await self.scan_sync_signal(band, device_name, device_args)
+            for i, cell in enumerate(cells):
+                self._handle_scan_progress(i, len(cells), ScanState.SIBS)
+                await self.scan_cell(cell['earfcn'], cell['cell_id'])
+            return cells
+        finally:
+            self._handle_scan_progress(100, 100, ScanState.NONE)
 
     async def scan_sync_signal(self, band: int, device_name: str, device_args: str) -> list:
         """
@@ -77,6 +110,12 @@ class Scanner:
         self.last_cells_scan[earfcn, cell_id] = sibs
         return sibs
 
+    def _handle_scan_progress(self, scanned, total, state=None):
+        if state is not None:
+            self.scan_state = state
+        self.progress = (scanned, total)
+        self.scan_progress_callback(self)
+
     async def _get_sync_signal_scan(self, band: int, device_name: str, device_args: str) -> list:
         """
         Scan for sync signals.
@@ -85,7 +124,7 @@ class Scanner:
         :param device_args: RF device related arguments.
         :return: List of found signals and related data - EARFCN, frequency, physical cell id, power.
         """
-        scanner = SyncSignalScanner.create(band, device_name, device_args)
+        scanner = SyncSignalScanner.create(band, device_name, device_args, self._handle_scan_progress)
         scanner.start()
         try:
             return await scanner.get_sync_signals()

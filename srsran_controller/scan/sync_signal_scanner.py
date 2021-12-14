@@ -18,6 +18,7 @@ LOGS_FOUND_CELL_FORMAT = (
     r'(?P<ports>\d*) ports, '
     r'PSS power=(?P<power>[\d\.\-]*) dBm'
 )
+LOGS_CURRENT_PROGRESS_FORMAT = r'\[([ \d]*)\/([ \d]*)]'
 
 
 class SyncSignalScanner(Entity):
@@ -25,13 +26,18 @@ class SyncSignalScanner(Entity):
     LOGS_SUFFIX = 'Bye'
     COMMAND = './lib/examples/cell_search -b {} -d {} -a {}'
 
+    def __init__(self, container, progress_callback):
+        super().__init__(container)
+        self._progress_callback = progress_callback
+
     @staticmethod
-    def create(band: int, device_name: str, device_args: str):
+    def create(band: int, device_name: str, device_args: str, progress_callback):
         """
         Create a SyncSignalScanner instance.
         :param band: Band to scan cells in.
         :param device_name: RF device to use for scanning, e.g. "UHD".
         :param device_args: RF device related arguments.
+        :param progress_callback: Callback function to be called on progress changes.
         :return: SyncSignalScanner object.
         :rtype: SyncSignalScanner
         """
@@ -41,7 +47,7 @@ class SyncSignalScanner(Entity):
             config.scanner_docker_image, SyncSignalScanner.COMMAND.format(band, device_name, device_args),
             auto_remove=False, name=SyncSignalScanner.CONTAINER_NAME, network_mode='none', privileged=True
         )
-        return SyncSignalScanner(container)
+        return SyncSignalScanner(container, progress_callback)
 
     async def get_sync_signals(self) -> list:
         """
@@ -59,15 +65,36 @@ class SyncSignalScanner(Entity):
         with suppress(APIError):
             self._container.remove()
 
+    def _get_current_logs(self) -> str:
+        """
+        Read the logs printed until now.
+        :return: stdout of sync signals scan.
+        """
+        return self._container.logs().decode()
+
+    def get_progress(self) -> tuple[int, int]:
+        """
+        Search for the last progress indication in the logs.
+        :return: current EARFCN and total number of EARFCNs.
+        """
+        try:
+            progress = re.findall(LOGS_CURRENT_PROGRESS_FORMAT, self._get_current_logs())[-1]
+            return int(progress[0]), int(progress[1])
+        except IndexError:
+            return 0, 0
+
     async def _get_all_logs(self) -> str:
         """
         Read all scan logs.
         :return: stdout of sync signals scan.
         """
-        while not self._container.logs().decode().strip().endswith(self.LOGS_SUFFIX):
+        while not self._get_current_logs().strip().endswith(self.LOGS_SUFFIX):
+            scanned, total = self.get_progress()
+            if total:
+                self._progress_callback(scanned, total)
             await asyncio.sleep(1)
 
-        return self._container.logs().decode()
+        return self._get_current_logs()
 
     def _parse_sync_signals(self, logs) -> list:
         found_buffer = re.findall(LOGS_FOOTER_FORMAT, logs, re.DOTALL)[0]
