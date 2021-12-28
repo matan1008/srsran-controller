@@ -35,7 +35,7 @@ def build_rbs():
             pdcp_config=SrsEnbRbQciConfigPdcpConfig(discard_timer=-1, status_report_required=True),
             rlc_config=SrsEnbRbQciConfigRlcConfig(
                 ul_am=SrsEnbRbQciConfigRlcConfigUlAm(t_poll_retx=120, poll_pdu=64, poll_byte=750,
-                                                      max_retx_thresh=16),
+                                                     max_retx_thresh=16),
                 dl_am=SrsEnbRbQciConfigRlcConfigDlAm(t_reordering=50, t_status_prohibit=50)
             ),
             logical_channel_config=SrsEnbRbQciConfigLogicalChannelConfig(
