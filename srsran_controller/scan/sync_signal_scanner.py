@@ -24,19 +24,20 @@ LOGS_CURRENT_PROGRESS_FORMAT = r'\[([ \d]*)\/([ \d]*)]'
 class SyncSignalScanner(Entity):
     CONTAINER_NAME = 'sync-signal-scanner'
     LOGS_SUFFIX = 'Bye'
-    COMMAND = './lib/examples/cell_search -b {} -d {} -a {}'
+    COMMAND = './lib/examples/cell_search -b {} -d {} -a {} -g {}'
 
     def __init__(self, container, progress_callback):
         super().__init__(container)
         self._progress_callback = progress_callback
 
     @staticmethod
-    def create(band: int, device_name: str, device_args: str, progress_callback):
+    def create(band: int, device_name: str, device_args: str, rx_gain: int, progress_callback):
         """
         Create a SyncSignalScanner instance.
         :param band: Band to scan cells in.
         :param device_name: RF device to use for scanning, e.g. "UHD".
         :param device_args: RF device related arguments.
+        :param rx_gain: RX gain.
         :param progress_callback: Callback function to be called on progress changes.
         :return: SyncSignalScanner object.
         :rtype: SyncSignalScanner
@@ -44,7 +45,7 @@ class SyncSignalScanner(Entity):
         client = docker.from_env()
         # Do not auto_remove since we need the logs only after the process ends.
         container = client.containers.create(
-            config.scanner_docker_image, SyncSignalScanner.COMMAND.format(band, device_name, device_args),
+            config.scanner_docker_image, SyncSignalScanner.COMMAND.format(band, device_name, device_args, rx_gain),
             auto_remove=False, name=SyncSignalScanner.CONTAINER_NAME, network_mode='none', privileged=True
         )
         return SyncSignalScanner(container, progress_callback)

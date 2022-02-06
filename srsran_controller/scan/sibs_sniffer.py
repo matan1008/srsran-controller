@@ -29,7 +29,7 @@ class SibsScanner(Entity):
         return scanner
 
 
-def _build_ue_configuration(earfcn, cell_id, client_ip):
+def _build_ue_configuration(earfcn, cell_id, rx_gain, client_ip):
     return SrsUeConfiguration(
         rat_eutra=SrsUeRatEutraConfiguration(dl_earfcn=earfcn),
         pcap=SrsUePcapConfiguration(mac_net_enable=True, client_ip=client_ip),
@@ -39,19 +39,21 @@ def _build_ue_configuration(earfcn, cell_id, client_ip):
             imsi='1' * 15,
             imei='3' * 15,
         ),
-        phy=SrsUePhyConfiguration(force_N_id_2=cell_id % 3, force_N_id_1=cell_id // 3)
+        phy=SrsUePhyConfiguration(force_N_id_2=cell_id % 3, force_N_id_1=cell_id // 3),
+        rf=SrsUeRfConfiguration(rx_gain=rx_gain),
     )
 
 
-def create_sibs_sniffer(earfcn, cell_id) -> SibsScanner:
+def create_sibs_sniffer(earfcn, cell_id, rx_gain) -> SibsScanner:
     """
     Start a SibsSniffer
     :param earfcn: EARFCN of cell to sniff.
     :param cell_id: Cell Id of cell to sniff.
+    :param rx_gain: RX gain.
     :return: Sniffing sibs scanner object.
     """
     with open(config.current_ue_configuration, 'w') as fd:
-        _build_ue_configuration(earfcn, cell_id, SibsScanner.CLIENT_IP).write(fd)
+        _build_ue_configuration(earfcn, cell_id, rx_gain, SibsScanner.CLIENT_IP).write(fd)
     sibs_scanner = SibsScanner.create(config.current_ue_configuration)
     sibs_scanner.start()
     return sibs_scanner

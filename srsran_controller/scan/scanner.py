@@ -40,6 +40,7 @@ class ScanState(Enum):
 
 class Scanner:
     SIBS_SCAN_TIMEOUT = 60
+    SCAN_GAIN = 70
 
     def __init__(self, logger: Logger = getLogger('srsran_controller')):
         self.last_sync_signals_scan = {}
@@ -123,7 +124,7 @@ class Scanner:
         :param device_args: RF device related arguments.
         :return: List of found signals and related data - EARFCN, frequency, physical cell id, power.
         """
-        scanner = SyncSignalScanner.create(band, device_name, device_args, self._handle_scan_progress)
+        scanner = SyncSignalScanner.create(band, device_name, device_args, self.SCAN_GAIN, self._handle_scan_progress)
         scanner.start()
         try:
             return await scanner.get_sync_signals()
@@ -132,7 +133,7 @@ class Scanner:
 
     @contextmanager
     def _run_cell_sniffer(self, earfcn, cell_id):
-        sibs_sniffer = create_sibs_sniffer(earfcn, cell_id)
+        sibs_sniffer = create_sibs_sniffer(earfcn, cell_id, self.SCAN_GAIN)
         try:
             yield
         finally:
