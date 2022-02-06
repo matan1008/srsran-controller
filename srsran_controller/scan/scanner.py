@@ -67,7 +67,7 @@ class Scanner:
             cells = await self.scan_sync_signal(band, device_name, device_args)
             for i, cell in enumerate(cells):
                 self._handle_scan_progress(i, len(cells), ScanState.SIBS)
-                await self.scan_cell(cell['earfcn'], cell['cell_id'])
+                await self.scan_cell(cell)
             return cells
         finally:
             self._handle_scan_progress(100, 100, ScanState.NONE)
@@ -86,17 +86,16 @@ class Scanner:
         self.logger.info(f'Found {len(cells)} sync signals')
         return cells
 
-    async def scan_cell(self, earfcn: int, cell_id: int) -> dict:
+    async def scan_cell(self, cell: dict) -> dict:
         """
         Scan SIBs of a specific cell.
-        :param earfcn: EARFCN of cell to scan.
-        :param cell_id: Physical cell id of cell to scan.
+        :param cell: Cell information.
         :return: Sibs scanned.
         """
-        self.logger.info(f'Scanning cell earfcn {earfcn}, cell_id {cell_id}')
+        self.logger.info('Scanning cell earfcn {}, cell_id {}'.format(cell['earfcn'], cell['cell_id']))
         sibs = {}
         raw_sibs = []
-        with self._run_cell_sniffer(earfcn, cell_id):
+        with self._run_cell_sniffer(cell['earfcn'], cell['cell_id']):
             sniffer = UuSniffer(find_interface_of_address(SibsScanner.CLIENT_IP), SibsScanner.CLIENT_IP)
             packet_generator = sniffer.start(use_json=True)
             try:
@@ -106,8 +105,8 @@ class Scanner:
             finally:
                 await packet_generator.aclose()
 
-        self._dump_scan(sibs, raw_sibs, earfcn, cell_id)
-        self.last_cells_scan[earfcn, cell_id] = sibs
+        self._dump_scan(sibs, raw_sibs, cell)
+        self.last_cells_scan[cell['earfcn'], cell['cell_id']] = sibs
         return sibs
 
     def _handle_scan_progress(self, scanned, total, state=None):
@@ -151,15 +150,16 @@ class Scanner:
             if 1 in sibs and all(sib in sibs for sib in sibs[1]['scheduled_sibs']):
                 break
 
-    def _dump_scan(self, sibs, raw_sibs, earfcn, cell_id):
+    def _dump_scan(self, sibs, raw_sibs, cell):
         if not config.scan_results:
             return
         scan_dir = Path(config.scan_results)
         scan_dir.mkdir(parents=True, exist_ok=True)
-        name_base = f'{datetime.now().timestamp()}_{earfcn}_{cell_id}'
+        name_base = '{}_{}_{}'.format(datetime.now().timestamp(), cell['earfcn'], cell['cell_id'])
         sib_path = scan_dir / (name_base + '.json')
         self.logger.debug(f'Writing scan results to {sib_path.absolute()}')
         with open(scan_dir / (name_base + '.raw.json'), 'w') as fd:
             json.dump(raw_sibs, fd, indent=4)
         with open(sib_path, 'w') as fd:
+            sibs['signal'] = cell
             json.dump(sibs, fd, indent=4)
