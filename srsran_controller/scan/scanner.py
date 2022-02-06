@@ -162,4 +162,5 @@ class Scanner:
             json.dump(raw_sibs, fd, indent=4)
         with open(sib_path, 'w') as fd:
             sibs['signal'] = cell
+            sibs['time'] = datetime.now().timestamp()
             json.dump(sibs, fd, indent=4)
