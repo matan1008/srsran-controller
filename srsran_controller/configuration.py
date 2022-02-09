@@ -32,7 +32,7 @@ class Configuration:
             setattr(self, field.name, data.get(field.name, getattr(self, field.name)))
 
 
-# Since it contains paths, intentionally create it with invalid values so it must be reloaded before using it.
+# Since it contains paths, intentionally create it with invalid values, so it must be reloaded before using it.
 
 config = Configuration(
     missions_configurations_folder='',
