@@ -32,6 +32,10 @@ SIB_NAMES = {
 }
 
 
+def sibs_complete(sibs):
+    return 1 in sibs and all(sib in sibs for sib in sibs[1]['scheduled_sibs'])
+
+
 class ScanState(Enum):
     NONE = auto()
     SIGNALS = auto()
@@ -102,9 +106,12 @@ class Scanner:
             try:
                 await asyncio.wait_for(self._sniff_cell_sibs(packet_generator, sibs, raw_sibs), self.SIBS_SCAN_TIMEOUT)
             except asyncio.TimeoutError:
-                self.logger.warning(f'Could not scan all sibs of cell')
+                pass
             finally:
                 await packet_generator.aclose()
+
+        if not sibs_complete(sibs):
+            self.logger.warning(f'Could not scan all sibs of cell')
 
         self._dump_scan(sibs, raw_sibs, cell)
         self.last_cells_scan[cell['earfcn'], cell['cell_id']] = sibs
@@ -148,7 +155,7 @@ class Scanner:
                 if event['event'] not in SIB_NAMES:
                     continue
                 sibs[SIB_NAMES[event['event']]] = event['data']
-            if 1 in sibs and all(sib in sibs for sib in sibs[1]['scheduled_sibs']):
+            if sibs_complete(sibs):
                 break
 
     def _dump_scan(self, sibs, raw_sibs, cell):
