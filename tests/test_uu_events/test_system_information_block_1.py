@@ -29,7 +29,7 @@ def test_parsing_sib1(tmp_path):
         'data': {
             'band': 3,
             'cell_barred': False,
-            'cell_identity': 39362576,
+            'cell_identity': 0x258a01,
             'csg_indication': False,
             'intra_freq_reselection': True,
             'plmns': [{'plmn': '42501', 'reserved': False},

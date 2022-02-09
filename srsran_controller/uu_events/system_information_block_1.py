@@ -36,7 +36,7 @@ def create(pkt):
             'data': {
                 'plmns': parse_plmns(cell_access),
                 'tac': int(cell_access.trackingAreaCode.replace(':', ''), 16),
-                'cell_identity': int(cell_access.cellIdentity.replace(':', ''), 16),
+                'cell_identity': int(cell_access.cellIdentity.replace(':', ''), 16) >> 4,
                 'cell_barred': cell_access.cellBarred != '1',
                 'intra_freq_reselection': cell_access.intraFreqReselection == '0',
                 'csg_indication': cell_access.csg_Indication != '0',
