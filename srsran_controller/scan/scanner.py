@@ -19,6 +19,7 @@ from srsran_controller.uu_events.system_information_block_3 import SIB3_NAME
 from srsran_controller.uu_events.system_information_block_4 import SIB4_NAME
 from srsran_controller.uu_events.system_information_block_5 import SIB5_NAME
 from srsran_controller.uu_events.system_information_block_6 import SIB6_NAME
+from srsran_controller.uu_events.system_information_block_7 import SIB7_NAME
 from srsran_controller.uu_events.uu_sniffer import UuSniffer
 
 SIB_NAMES = {
@@ -29,6 +30,7 @@ SIB_NAMES = {
     SIB4_NAME: 4,
     SIB5_NAME: 5,
     SIB6_NAME: 6,
+    SIB7_NAME: 7,
 }
 
 

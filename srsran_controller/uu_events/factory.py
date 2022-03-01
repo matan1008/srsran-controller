@@ -16,6 +16,7 @@ from srsran_controller.uu_events.system_information_block_3 import create as cre
 from srsran_controller.uu_events.system_information_block_4 import create as create_sib4
 from srsran_controller.uu_events.system_information_block_5 import create as create_sib5
 from srsran_controller.uu_events.system_information_block_6 import create as create_sib6
+from srsran_controller.uu_events.system_information_block_7 import create as create_sib7
 
 
 class EventsFactory:
@@ -38,6 +39,7 @@ class EventsFactory:
             create_sib4,
             create_sib5,
             create_sib6,
+            create_sib7,
         ]
 
     def from_packet(self, pkt):
