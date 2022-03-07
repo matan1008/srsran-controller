@@ -69,7 +69,7 @@ class ConfigurationsManager:
             try:
                 missions.append(MissionConfiguration.from_dict(data))
             except TypeError:
-                self.logger.warning(f'Could not load mission {f.name}')
+                self.logger.warning(f'Could not load mission {f.name}', exc_info=True)
         return missions
 
     @property
