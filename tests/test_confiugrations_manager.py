@@ -6,7 +6,8 @@ import pytest
 
 from srsran_controller.configurations_manager import ConfigurationsManager
 from srsran_controller.exceptions import MissionIdNotFoundError
-from srsran_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbor, EnbCell
+from srsran_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbour, EnbCell, \
+    IntraFreqNeighbour
 
 
 def test_create_mission(tmpdir):
@@ -74,13 +75,23 @@ def test_list_missions(tmpdir):
     assert len(configuration_manager.list_missions()) == 2
 
 
-def test_mission_with_gsm_neighbor(tmpdir):
+def test_mission_with_gsm_neighbour(tmpdir):
     configuration_manager = ConfigurationsManager(tmpdir)
     conf = configuration_manager.create_mission()
-    conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
+    conf.gsm_neighbours = [GsmNeighbour(arfcn=871, band='dcs1800')]
     configuration_manager.update_mission(conf)
-    assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].arfcn == conf.gsm_neighbors[0].arfcn
-    assert configuration_manager.get_mission(conf.id).gsm_neighbors[0].band == conf.gsm_neighbors[0].band
+    assert configuration_manager.get_mission(conf.id).gsm_neighbours[0].arfcn == conf.gsm_neighbours[0].arfcn
+    assert configuration_manager.get_mission(conf.id).gsm_neighbours[0].band == conf.gsm_neighbours[0].band
+
+
+def test_mission_with_intra_feq_neighbours(tmpdir):
+    configuration_manager = ConfigurationsManager(tmpdir)
+    conf = configuration_manager.create_mission()
+    conf.intra_freq_neighbours = [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
+    configuration_manager.update_mission(conf)
+    mission = configuration_manager.get_mission(conf.id)
+    assert mission.intra_freq_neighbours[0].phys_cell_id == conf.intra_freq_neighbours[0].phys_cell_id
+    assert mission.intra_freq_neighbours[0].q_offset_cell == conf.intra_freq_neighbours[0].q_offset_cell
 
 
 def test_updating_all_configuration_values(tmpdir):
@@ -95,7 +106,8 @@ def test_updating_all_configuration_values(tmpdir):
     conf.apn = 'inter'
     conf.full_net_name = 'new full'
     conf.short_net_name = 'new short'
-    conf.gsm_neighbors = [GsmNeighbor(arfcn=871, band='dcs1800')]
+    conf.gsm_neighbours = [GsmNeighbour(arfcn=871, band='dcs1800')]
+    conf.intra_freq_neighbours = [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
     conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     conf.device_name = 'auto'
     conf.device_args = 'serial=33333333'
@@ -113,7 +125,8 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.apn == 'inter'
     assert conf.full_net_name == 'new full'
     assert conf.short_net_name == 'new short'
-    assert conf.gsm_neighbors == [GsmNeighbor(arfcn=871, band='dcs1800')]
+    assert conf.gsm_neighbours == [GsmNeighbour(arfcn=871, band='dcs1800')]
+    assert conf.intra_freq_neighbours == [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
     assert conf.cells == [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
     assert conf.device_name == 'auto'
     assert conf.device_args == 'serial=33333333'

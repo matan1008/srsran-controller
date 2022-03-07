@@ -10,7 +10,13 @@ class EnbCell:
 
 
 @dataclass
-class GsmNeighbor:
+class IntraFreqNeighbour:
+    phys_cell_id: int
+    q_offset_cell: int
+
+
+@dataclass
+class GsmNeighbour:
     arfcn: int
     band: str
 
@@ -18,7 +24,8 @@ class GsmNeighbor:
 @dataclass
 class MissionConfiguration:
     id: str = field(default_factory=lambda: str(uuid4()))
-    gsm_neighbors: list[GsmNeighbor] = field(default_factory=list)
+    intra_freq_neighbours: list[IntraFreqNeighbour] = field(default_factory=list)
+    gsm_neighbours: list[GsmNeighbour] = field(default_factory=list)
     cells: list[EnbCell] = field(default_factory=lambda: [EnbCell()])
     name: str = 'New mission'
     mcc: str = '001'
@@ -36,6 +43,7 @@ class MissionConfiguration:
 
     @staticmethod
     def from_dict(data: dict):
-        data['gsm_neighbors'] = [GsmNeighbor(**neighbor_data) for neighbor_data in data.get('gsm_neighbors', [])]
+        data['intra_freq_neighbours'] = [IntraFreqNeighbour(**neigh) for neigh in data.get('intra_freq_neighbours', [])]
+        data['gsm_neighbours'] = [GsmNeighbour(**neigh) for neigh in data.get('gsm_neighbours', [])]
         data['cells'] = [EnbCell(**cell_data) for cell_data in data.get('cells', [])]
         return MissionConfiguration(**data)

@@ -8,13 +8,24 @@ from srsran_controller.srsran_configurations.enb_sibs import *
 
 
 def build_sibs(conf):
-    gsm_neighbors = tuple(
-        SrsEnbSib7CarrierFreqsInfo(
-            start_arfcn=neighbor.arfcn, band_ind=neighbor.band, explicit_list_of_arfcns=(neighbor.arfcn,)
+    scheduled_sibs = [3]
+    sib4 = None
+    sib7 = None
+    if conf.intra_freq_neighbours:
+        intra_freq_neighs = tuple(
+            SrsEnbSib4IntraFreqNeighCellInfo(n.phys_cell_id, n.q_offset_cell) for n in conf.intra_freq_neighbours
         )
-        for neighbor in conf.gsm_neighbors
-    )
-    return SrsEnbSibs(sib7=SrsEnbSib7(carrier_freqs_info_list=gsm_neighbors))
+        sib4 = SrsEnbSib4(intra_freq_neigh_cell_list=intra_freq_neighs)
+        scheduled_sibs.append(4)
+    if conf.gsm_neighbours:
+        gsm_neighbours = tuple(
+            SrsEnbSib7CarrierFreqsInfo(start_arfcn=n.arfcn, band_ind=n.band, explicit_list_of_arfcns=(n.arfcn,))
+            for n in conf.gsm_neighbours
+        )
+        sib7 = SrsEnbSib7(carrier_freqs_info_list=gsm_neighbours)
+        scheduled_sibs.append(7)
+    sib1 = SrsEnbSib1(sched_info=(SrsEnbSib1SchedulerInfo(si_periodicity=16, si_mapping_info=scheduled_sibs),))
+    return SrsEnbSibs(sib1=sib1, sib4=sib4, sib7=sib7)
 
 
 def build_rbs():

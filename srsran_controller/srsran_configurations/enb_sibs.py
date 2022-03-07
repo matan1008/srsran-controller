@@ -165,7 +165,7 @@ class SrsEnbSib2:
 
 @dataclass
 class SrsEnbSib3CellReselectionCommon:
-    q_hyst: int = 24  # Higher hysteresis helps the serving cell when ranking against neighboring cells, in dB.
+    q_hyst: int = 24  # Higher hysteresis helps the serving cell when ranking against neighbouring cells, in dB.
 
 
 @dataclass
@@ -197,7 +197,7 @@ class SrsEnbSib3:
 @dataclass
 class SrsEnbSib4IntraFreqNeighCellInfo:
     phys_cell_id: int
-    q_offset_range: int = 24
+    q_offset_range: int = 24  # Lower values will improve neighbour's rank.
 
 
 @dataclass
