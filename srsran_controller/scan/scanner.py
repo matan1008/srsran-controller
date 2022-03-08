@@ -67,7 +67,7 @@ class Scanner:
         :param device_name: RF device type to use.
         :param device_args: Device specific arguments.
         """
-        self.logger.info(f'Scanning band {band}')
+        self.logger.info(f'Scanning band {band}, device: {device_name}, args: {device_args}')
 
         self._handle_scan_progress(0, 0, ScanState.SIGNALS)
         try:
@@ -99,7 +99,9 @@ class Scanner:
         :param cell: Cell information.
         :return: Sibs scanned.
         """
-        self.logger.info('Scanning cell earfcn {}, cell_id {}'.format(cell['earfcn'], cell['cell_id']))
+        self.logger.info('Scanning cell earfcn {}, cell_id {}, timeout {}, rx gain {}'.format(
+            cell['earfcn'], cell['cell_id'], self.SIBS_SCAN_TIMEOUT, self.SCAN_GAIN)
+        )
         sibs = {}
         raw_sibs = []
         with self._run_cell_sniffer(cell['earfcn'], cell['cell_id']):
