@@ -9,6 +9,7 @@ from typing import AsyncGenerator
 
 from srsran_controller.common.ip import find_interface_of_address
 from srsran_controller.configuration import config
+from srsran_controller.exceptions import ScanInterruptedError
 from srsran_controller.scan.sibs_sniffer import create_sibs_sniffer, SibsScanner
 from srsran_controller.scan.sync_signal_scanner import SyncSignalScanner
 from srsran_controller.uu_events.factory import EventsFactory
@@ -42,6 +43,7 @@ class ScanState(Enum):
     NONE = auto()
     SIGNALS = auto()
     SIBS = auto()
+    ERROR = auto()
 
 
 class Scanner:
@@ -58,7 +60,7 @@ class Scanner:
 
     @property
     def is_scanning(self):
-        return self.scan_state != ScanState.NONE
+        return self.scan_state in (ScanState.SIBS, ScanState.SIGNALS)
 
     async def scan(self, band: int, device_name: str = 'UHD', device_args: str = ''):
         """
@@ -76,8 +78,11 @@ class Scanner:
                 self._handle_scan_progress(i, len(cells), ScanState.SIBS)
                 await self.scan_cell(cell)
             return cells
+        except ScanInterruptedError:
+            self._handle_scan_progress(100, 100, ScanState.ERROR)
         finally:
-            self._handle_scan_progress(100, 100, ScanState.NONE)
+            if self.scan_state != ScanState.ERROR:
+                self._handle_scan_progress(100, 100, ScanState.NONE)
 
     async def scan_sync_signal(self, band: int, device_name: str, device_args: str) -> list:
         """

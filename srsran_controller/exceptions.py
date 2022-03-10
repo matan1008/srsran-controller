@@ -26,3 +26,8 @@ class MissionIsNotRunningError(SrsranControllerException):
 class ScanIsNotRunningError(SrsranControllerException):
     """ Raise when trying to stop a scan while no scan is running. """
     pass
+
+
+class ScanInterruptedError(SrsranControllerException):
+    """ Raise when scan is interrupted. """
+    pass

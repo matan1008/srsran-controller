@@ -7,6 +7,7 @@ from docker.errors import APIError
 
 from srsran_controller.common.docker.entity import Entity
 from srsran_controller.configuration import config
+from srsran_controller.exceptions import ScanInterruptedError
 
 LOGS_FOOTER_FORMAT = r'Found \d* cells(.*)Bye'
 LOGS_FOUND_CELL_FORMAT = (
@@ -89,8 +90,15 @@ class SyncSignalScanner(Entity):
         Read all scan logs.
         :return: stdout of sync signals scan.
         """
+        previous_scanned = 0
         while not self._get_current_logs().strip().endswith(self.LOGS_SUFFIX):
             scanned, total = self.get_progress()
+            if previous_scanned == scanned:
+                self._container.reload()
+                if self._container.status == 'exited':
+                    self.logger.error(f'Sync signals scan interrupted: {self._container.logs().decode()}')
+                    raise ScanInterruptedError()
+            previous_scanned = scanned
             if total:
                 self._progress_callback(scanned, total)
             await asyncio.sleep(1)
