@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import AsyncGenerator
 
 from srsran_controller.common.ip import find_interface_of_address
+from srsran_controller.common.uhd import query_sensor
 from srsran_controller.configuration import config
 from srsran_controller.exceptions import ScanInterruptedError
 from srsran_controller.scan.sibs_sniffer import create_sibs_sniffer, SibsScanner
@@ -76,7 +77,7 @@ class Scanner:
             cells = await self.scan_sync_signal(band, device_name, device_args)
             for i, cell in enumerate(cells):
                 self._handle_scan_progress(i, len(cells), ScanState.SIBS)
-                await self.scan_cell(cell)
+                await self.scan_cell(cell, device_args)
             return cells
         except ScanInterruptedError:
             self._handle_scan_progress(100, 100, ScanState.ERROR)
@@ -98,10 +99,11 @@ class Scanner:
         self.logger.info(f'Found {len(cells)} sync signals')
         return cells
 
-    async def scan_cell(self, cell: dict) -> dict:
+    async def scan_cell(self, cell: dict, device_args: str) -> dict:
         """
         Scan SIBs of a specific cell.
         :param cell: Cell information.
+        :param device_args: RF device related arguments.
         :return: Sibs scanned.
         """
         self.logger.info('Scanning cell earfcn {}, cell_id {}, timeout {}, rx gain {}'.format(
@@ -122,7 +124,7 @@ class Scanner:
         if not sibs_complete(sibs):
             self.logger.warning(f'Could not scan all sibs of cell')
 
-        self._dump_scan(sibs, raw_sibs, cell)
+        await self._dump_scan(sibs, raw_sibs, cell, device_args)
         self.last_cells_scan[cell['earfcn'], cell['cell_id']] = sibs
         return sibs
 
@@ -167,7 +169,14 @@ class Scanner:
             if sibs_complete(sibs):
                 break
 
-    def _dump_scan(self, sibs, raw_sibs, cell):
+    async def _dump_scan(self, sibs, raw_sibs, cell, device_args):
+        """
+        Dump a scan result.
+        :param sibs: Parsed SIBs
+        :param raw_sibs: Raw pcap SIBs.
+        :param cell: Signal related information.
+        :param device_args: RF device related arguments.
+        """
         if not config.scan_results:
             return
         scan_dir = Path(config.scan_results)
@@ -180,4 +189,10 @@ class Scanner:
         with open(sib_path, 'w') as fd:
             sibs['signal'] = cell
             sibs['time'] = datetime.now().timestamp()
+            sibs['gps'] = {
+                'locked': await query_sensor('/mboards/0/sensors/gps_locked', address=device_args) != 'false',
+                'servo': await query_sensor('/mboards/0/sensors/gps_servo', address=device_args),
+                'gga': await query_sensor('/mboards/0/sensors/gps_gpgga', address=device_args),
+                'rmc': await query_sensor('/mboards/0/sensors/gps_gprmc', address=device_args),
+            }
             json.dump(sibs, fd, indent=4)
