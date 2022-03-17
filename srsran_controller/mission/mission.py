@@ -33,6 +33,13 @@ class Mission:
         self.start_time = datetime.now()
         self._sniffing_task = asyncio.create_task(self._sniff_packets())
 
+    @property
+    def duration(self) -> int:
+        """
+        Return the duration of the mission, in seconds.
+        """
+        return (datetime.now() - self.start_time).seconds
+
     async def ping(self, imsi: str) -> Ping:
         """
         Ping a UE.
