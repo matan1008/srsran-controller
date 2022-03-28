@@ -1,5 +1,5 @@
 from srsran_controller.mission.channel_tracker import ChannelTracker, RA_RESPONSE_NAME, ATTACH_REQUEST_NAME, \
-    ATTACH_ACCEPT_NAME
+    ATTACH_ACCEPT_NAME, SECURITY_MODE_COMPLETE_NAME
 
 
 def test_create_channel():
@@ -46,3 +46,15 @@ def test_imsi_to_ip():
     tracker.handle_uu_event({'rnti': 24, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
     tracker.handle_uu_event({'rnti': 24, 'tmsi': '0x53d764bc', 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.4'})
     assert tracker.imsi_to_ip('001010123456789') == '172.16.0.4'
+
+
+def test_preserving_imeisv_on_rnti_change():
+    tracker = ChannelTracker()
+    tracker.handle_uu_event({'c-rnti': 20, 'ta': 3, 'event': RA_RESPONSE_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'imeisv': '3151231231231234', 'event': SECURITY_MODE_COMPLETE_NAME})
+    tracker.handle_uu_event({'c-rnti': 21, 'ta': 3, 'event': RA_RESPONSE_NAME})
+    tracker.handle_uu_event({'rnti': 21, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
+    event = {'rnti': 21}
+    tracker.enrich_event(event)
+    assert event['imeisv'] == '3151231231231234'

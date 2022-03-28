@@ -96,4 +96,6 @@ class ChannelTracker:
         # Remove old channels related to this imsi.
         for old_rnti in list(self._rnti_channels.keys()):
             if self._rnti_channels[old_rnti].imsi == event['imsi'] and old_rnti != event['rnti']:
+                if self._rnti_channels[old_rnti].imeisv:
+                    self._rnti_channels[event['rnti']].imeisv = self._rnti_channels[old_rnti].imeisv
                 del self._rnti_channels[old_rnti]
