@@ -33,6 +33,11 @@ class ScanInterruptedError(SrsranControllerException):
     pass
 
 
+class EntityControlError(SrsranControllerException):
+    """ Raise when a control command fails. """
+    pass
+
+
 class UnknownScriptError(SrsranControllerException):
     """ Raise when trying to get script class of an unknown script. """
     pass
