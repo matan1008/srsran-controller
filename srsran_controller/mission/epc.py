@@ -6,6 +6,7 @@ from srsran_controller.common.docker.entity import Entity
 from srsran_controller.common.ip import asyncio_udp_send_receive
 from srsran_controller.common.ip import construct_forward
 from srsran_controller.configuration import config
+from srsran_controller.exceptions import EntityControlError
 
 
 class Epc(Entity):
@@ -54,6 +55,18 @@ class Epc(Entity):
         if not imsi:
             return ''
         return f'{imsi:015}'
+
+    async def send_downlink_nas_transport(self, imsi: str, data: bytes) -> None:
+        """
+        Send downlink NAS transport.
+        :param imsi: UE's IMEI.
+        :param data: CP data to send.
+        """
+        request = b'send_downlink_nas_transport '
+        request += struct.pack('<QB', int(imsi), len(data)) + data
+        response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
+        if response != b'\x00':
+            raise EntityControlError()
 
     def ip_forward(self, network) -> None:
         """
