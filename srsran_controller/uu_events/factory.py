@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from srsran_controller.uu_events.gsm_cp_ack import create as create_gsm_cp_ack
+from srsran_controller.uu_events.gsm_rp_ack import create as create_gsm_rp_ack
 from srsran_controller.uu_events.gsm_sms_submit import create as create_gsm_sms_submit
 from srsran_controller.uu_events.master_information_block import create as create_mib
 from srsran_controller.uu_events.nas_emm_attach_accept import create as create_attach_accept
@@ -23,6 +25,8 @@ class EventsFactory:
 
     def __init__(self):
         self.events_creators = [
+            create_gsm_cp_ack,
+            create_gsm_rp_ack,
             create_gsm_sms_submit,
             create_mib,
             create_attach_accept,
