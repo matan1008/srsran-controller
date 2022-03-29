@@ -58,3 +58,15 @@ def test_preserving_imeisv_on_rnti_change():
     event = {'rnti': 21}
     tracker.enrich_event(event)
     assert event['imeisv'] == '3151231231231234'
+
+
+def test_preserving_ip_on_rnti_change():
+    tracker = ChannelTracker()
+    tracker.handle_uu_event({'c-rnti': 20, 'ta': 3, 'event': RA_RESPONSE_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'tmsi': '0x53d764bc', 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.4'})
+    tracker.handle_uu_event({'c-rnti': 21, 'ta': 3, 'event': RA_RESPONSE_NAME})
+    tracker.handle_uu_event({'rnti': 21, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
+    event = {'rnti': 21}
+    tracker.enrich_event(event)
+    assert event['ip'] == '172.16.0.4'
