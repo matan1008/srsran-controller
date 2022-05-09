@@ -12,7 +12,7 @@ def build_configuration(conf, epc_ip):
         hss=SrsEpcHssConfiguration(db_file=Epc.HSS_CONFIGURATION_PATH),
         spgw=SrsEpcSpgwConfiguration(gtpu_bind_addr=epc_ip, sgi_if_name=Epc.SGI_INTERFACE_NAME),
         pcap=SrsEpcPcapConfiguration(enable=True, filename=Epc.CAP_CONTAINER_PATH),
-        log=SrsEpcLogConfiguration(filename=Epc.LOG_CONTAINER_PATH, all_level='debug')
+        log=SrsEpcLogConfiguration(filename=Epc.LOG_CONTAINER_PATH)
     )
 
 

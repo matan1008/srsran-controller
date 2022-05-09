@@ -52,7 +52,7 @@ class SrsEnbPcapConfiguration:
 class SrsEnbLogConfiguration:
     rf_level: str = 'info'
     phy_level: str = 'info'
-    phy_lib_level: str = 'info'
+    phy_lib_level: str = 'warning'
     mac_level: str = 'info'
     rlc_level: str = 'info'
     pdcp_level: str = 'info'

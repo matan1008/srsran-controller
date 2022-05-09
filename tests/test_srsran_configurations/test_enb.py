@@ -52,7 +52,7 @@ def test_sanity():
         '[log]\n'
         'rf_level = info\n'
         'phy_level = info\n'
-        'phy_lib_level = info\n'
+        'phy_lib_level = warning\n'
         'mac_level = info\n'
         'rlc_level = info\n'
         'pdcp_level = info\n'
