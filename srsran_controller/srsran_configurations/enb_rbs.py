@@ -79,4 +79,7 @@ class SrsEnbRbs:
     qci_config: tuple[SrsEnbRbQciConfig, ...]
 
     def write(self, fd: TextIO):
-        libconf.dump({'qci_config': tuple(config.to_dict() for config in self.qci_config)}, fd)
+        libconf.dump({
+            'qci_config': tuple(config.to_dict() for config in self.qci_config),
+            'five_qi_config': (),
+        }, fd)

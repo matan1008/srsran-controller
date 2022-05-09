@@ -1,5 +1,6 @@
-from srsran_controller.srsran_configurations.enb_rbs import *
 from io import StringIO
+
+from srsran_controller.srsran_configurations.enb_rbs import *
 
 
 def test_sanity():
@@ -88,5 +89,9 @@ def test_sanity():
         '            log_chan_group = 3;\n'
         '        };\n'
         '    }\n'
+        ');\n'
+        'five_qi_config =\n'
+        '(\n'
+        '\n'
         ');\n'
     )
