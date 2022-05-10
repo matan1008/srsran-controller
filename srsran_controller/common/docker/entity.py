@@ -13,6 +13,14 @@ class Entity:
         self._container = container
         self.logger = logger
 
+    @property
+    def container(self):
+        """
+        :return: Entity's container.
+        :rtype: docker.models.containers.Container
+        """
+        return self._container
+
     def start(self):
         """
         Start the entity.
