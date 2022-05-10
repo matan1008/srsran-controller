@@ -1,8 +1,8 @@
 import docker
 
+from srsran_controller.common.docker.entity import Entity
 from srsran_controller.common.ip import construct_forward
 from srsran_controller.configuration import config
-from srsran_controller.common.docker.entity import Entity
 
 
 class Epc(Entity):
@@ -13,7 +13,6 @@ class Epc(Entity):
     TUN_CONTROL_PATH = '/dev/net/tun'
     LOG_CONTAINER_PATH = '/tmp/epc.log'
     CAP_CONTAINER_PATH = '/tmp/epc.pcap'
-    PING_COMMAND = 'ping {}'
     SGI_INTERFACE_NAME = 'srs_spgw_sgi'
 
     @staticmethod
@@ -38,16 +37,6 @@ class Epc(Entity):
         epc = Epc(container)
         epc._disconnect('none')
         return epc
-
-    def ping(self, ip: str):
-        """
-        Run ping command inside the container.
-        :param ip: IP to ping.
-        :return: Socket connected to the ping stdin and stdout.
-        :rtype: socket.socket
-        """
-        _, sock = self._container.exec_run(self.PING_COMMAND.format(ip), stdin=True, socket=True, tty=True)
-        return sock._sock
 
     def ip_forward(self, network) -> None:
         """

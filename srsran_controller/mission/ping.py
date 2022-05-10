@@ -11,6 +11,7 @@ class PingStatus(Enum):
 
 class Ping:
     STOP_COMMAND = b'\x03'
+    PING_COMMAND = 'ping {}'
 
     def __init__(self, ip: str, imsi: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, status_callback,
                  log_callback):
@@ -40,8 +41,8 @@ class Ping:
         :return: Initialized and running ping object.
         :rtype: Ping
         """
-        sock = epc.ping(ip)
-        ping = Ping(ip, imsi, *await asyncio.open_connection(sock=sock), status_callback, log_callback)
+        _, sock = epc.container.exec_run(Ping.PING_COMMAND.format(ip), stdin=True, socket=True, tty=True)
+        ping = Ping(ip, imsi, *await asyncio.open_connection(sock=sock._sock), status_callback, log_callback)
         status_callback(ping)
         return ping
 
