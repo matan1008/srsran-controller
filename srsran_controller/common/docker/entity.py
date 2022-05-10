@@ -37,7 +37,7 @@ class Entity:
     def connect(self, network, ip: str):
         """
         Connect the underlying container to a specified docker network, giving it the specified IP address.
-        :param srsran_controller.mission.network.Network network: Docker network to attach to.
+        :param srsran_controller.common.docker.network.Network network: Docker network to attach to.
         :param ip: Container IP inside the network.
         """
         client = docker.from_env()
