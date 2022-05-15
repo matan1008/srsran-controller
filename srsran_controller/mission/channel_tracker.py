@@ -40,6 +40,14 @@ class ChannelTracker:
             if channel.imsi == imsi:
                 return channel.ip
 
+    def get_channel(self, rnti: int) -> ChannelMetadata:
+        """
+        Get channel's metadate.
+        :param rnti: C-RNTI of the request channel.
+        :return: All known metadata about the channel.
+        """
+        return self._rnti_channels[rnti]
+
     def enrich_event(self, event: dict) -> None:
         """
         Add additional data to a Uu event, based on the RNTI.

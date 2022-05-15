@@ -48,6 +48,17 @@ def test_imsi_to_ip():
     assert tracker.imsi_to_ip('001010123456789') == '172.16.0.4'
 
 
+def test_get_channel():
+    tracker = ChannelTracker()
+    tracker.handle_uu_event({'c-rnti': 20, 'ta': 3, 'event': RA_RESPONSE_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME})
+    tracker.handle_uu_event({'rnti': 20, 'tmsi': '0x53d764bc', 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.2'})
+    metadata = tracker.get_channel(20)
+    assert metadata.imsi == '001010123456789'
+    assert metadata.ip == '172.16.0.2'
+    assert metadata.ta == 3
+
+
 def test_preserving_imeisv_on_rnti_change():
     tracker = ChannelTracker()
     tracker.handle_uu_event({'c-rnti': 20, 'ta': 3, 'event': RA_RESPONSE_NAME})
