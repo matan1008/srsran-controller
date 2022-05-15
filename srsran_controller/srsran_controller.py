@@ -50,6 +50,7 @@ class SrsranController:
             raise exceptions.MissionAlreadyRunningError()
 
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
+        self._current_mission.uu_packets_callback = self.scripts_manager.handle_new_uu_packet
         self.logger.debug('Mission launched successfully')
         return self._current_mission
 

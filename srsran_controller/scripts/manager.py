@@ -2,6 +2,8 @@ import asyncio
 from datetime import datetime
 from logging import getLogger
 
+CRNTI_TYPE = 3
+
 
 class ScriptsManager:
     def __init__(self):
@@ -55,3 +57,13 @@ class ScriptsManager:
         :param log: Log's data.
         """
         self.script_log_callback(script, time, log)
+
+    def handle_new_uu_packet(self, pkt):
+        """
+        Handle arrival of a new UU packet.
+        """
+        mac_layer = getattr(pkt, 'mac-lte', None)
+        if mac_layer is None or int(mac_layer.rnti_type) != CRNTI_TYPE:
+            return
+        for script in filter(lambda s: not s.stopped, self.scripts):
+            script.handle_new_uu_packet(int(mac_layer.rnti), pkt)

@@ -20,6 +20,7 @@ class Mission:
         """
         self.uu_events = []
         self.uu_events_callback = lambda event: None
+        self.uu_packets_callback = lambda event: None
         self.channel_tracker = ChannelTracker()
         self.epc = epc
         self.enb = enb
@@ -52,6 +53,7 @@ class Mission:
         events_factory = EventsFactory()
         sniffer = UuSniffer(self._lte_network.INTERFACE_NAME, self._lte_network.GATEWAY)
         async for packet in sniffer.start():
+            self.uu_packets_callback(packet)
             for event in events_factory.from_packet(packet):
                 self._handle_uu_event(event)
 

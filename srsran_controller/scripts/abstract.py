@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-
+from asyncio.queues import Queue
 from datetime import datetime
 from enum import Enum
 from logging import getLogger
@@ -27,6 +27,7 @@ class AbstractScript(ABC):
         self.start_time = datetime.now()
         self.stop_time = None
         self.status = ScriptStatus.STARTED
+        self.uu_queue = Queue()
 
     @property
     def status(self):
@@ -65,3 +66,27 @@ class AbstractScript(ABC):
         Script specific cleaning operation.
         """
         pass
+
+    def handle_new_uu_packet(self, rnti: int, packet) -> None:
+        """
+        Handle arrival of a new packet.
+        :param rnti: C-RNTI of the packet.
+        :param packet: Parsed packet object.
+        """
+        if self.mission.channel_tracker.get_channel(rnti).imsi != self.imsi:
+            return
+        self.uu_queue.put_nowait(packet)
+
+    async def wait_for_parsed_packet(self, validator):
+        """
+        Wait for a specific packet.
+        :param validator: Callback function to match the desired packet.
+        :return: Packet's object.
+        """
+        while True:
+            packet = await self.uu_queue.get()
+            try:
+                if validator(packet):
+                    return packet
+            except (KeyError, AttributeError):
+                pass
