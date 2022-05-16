@@ -68,6 +68,26 @@ class Epc(Entity):
         if response != b'\x00':
             raise EntityControlError()
 
+    async def send_paging(self, imsi: str) -> None:
+        """
+        Send paging.
+        :param imsi: UE's IMEI.
+        """
+        self.logger.info(f'Sending page to {imsi}')
+        request = b'send_paging ' + struct.pack('<Q', int(imsi))
+        response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
+        if response != b'\x00':
+            raise EntityControlError()
+
+    async def is_ecm_connected(self, imsi: str) -> bool:
+        """
+        Check that the imsi has active connection to the MME.
+        :param imsi: UE's IMEI.
+        """
+        request = b'is_ecm_connected ' + struct.pack('<Q', int(imsi))
+        response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
+        return bool(response[0])
+
     def ip_forward(self, network) -> None:
         """
         Forward ip transportation from the EPC to the specified network.
