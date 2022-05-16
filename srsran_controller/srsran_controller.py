@@ -12,6 +12,7 @@ from srsran_controller.scan.scanner import Scanner
 from srsran_controller.scripts.executor import ScriptsExecutor
 from srsran_controller.scripts.importer import ScriptsImporter
 from srsran_controller.scripts.ping import Ping
+from srsran_controller.scripts.sms import Sms
 from srsran_controller.subject import Subject
 from srsran_controller.subscribers_manager import SubscribersManager
 
@@ -100,6 +101,19 @@ class SrsranController:
         ping = Ping()
         await self.run_script(ping, imsi)
         return ping
+
+    async def sms(self, imsi: str, text: str, rp_oa: str, tp_oa: str) -> Sms:
+        """
+        Send SMS to a UE.
+        :param imsi: UE's IMSI.
+        :param text: Message to send.
+        :param rp_oa: RP Originator.
+        :param tp_oa: TP Originator.
+        :return: SMS script object.
+        """
+        sms = Sms(text, rp_oa, tp_oa)
+        await self.run_script(sms, imsi)
+        return sms
 
     async def scan(self, band: int, device_name: str = 'UHD', device_args: str = ''):
         """
