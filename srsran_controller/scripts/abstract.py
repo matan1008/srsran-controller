@@ -109,6 +109,13 @@ class AbstractScript(ABC):
             except (KeyError, AttributeError):
                 pass
 
+    async def ecm_connect(self):
+        if await self.mission.epc.is_ecm_connected(self.imsi):
+            return
+        await self.mission.epc.send_paging(self.imsi)
+        while not await self.mission.epc.is_ecm_connected(self.imsi):
+            await asyncio.sleep(0.1)
+
     async def _wrapped_run(self):
         try:
             self.status = ScriptStatus.STARTED
