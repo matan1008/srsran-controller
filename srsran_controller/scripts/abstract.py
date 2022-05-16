@@ -1,33 +1,34 @@
+import asyncio
 from abc import abstractmethod, ABC
 from asyncio.queues import Queue
 from datetime import datetime
-from enum import Enum
+from enum import Enum, auto
 from logging import getLogger
 from uuid import uuid4
 
 
 class ScriptStatus(Enum):
-    STARTED = 0
-    STOPPED = 1
+    PENDING = auto()
+    STARTED = auto()
+    STOPPED = auto()
+    ERROR = auto()
+    COMPLETED = auto()
 
 
 class AbstractScript(ABC):
-    def __init__(self, imsi: str, mission, manager):
-        """
-        :param srsran_controller.mission.mission.Mission mission: Current mission.
-        :param srsran_controller.scripts.manager.ScriptsManager manager: Scripts manager.
-        """
+    def __init__(self):
         self._logger = getLogger('srsran_controller')
-        self.imsi = imsi
-        self.mission = mission
-        self.manager = manager
+        self.imsi = None
+        self.mission = None
+        self.manager = None
         self.stopped = False
         self.id = str(uuid4())
         self.logs = []
         self.start_time = datetime.now()
         self.stop_time = None
-        self.status = ScriptStatus.STARTED
+        self._status = ScriptStatus.PENDING
         self.uu_queue = Queue()
+        self.main_task = None
 
     @property
     def status(self):
@@ -46,9 +47,18 @@ class AbstractScript(ABC):
         if self.stopped:
             return
         self.stopped = True
-        await self.clean()
-        self.stop_time = datetime.now()
-        self.status = ScriptStatus.STOPPED
+        self.main_task.cancel()
+
+    async def start(self, imsi: str, mission, manager) -> None:
+        """
+        :param imsi: UE's IMSI.
+        :param srsran_controller.mission.mission.Mission mission: Current mission.
+        :param srsran_controller.scripts.manager.ScriptsManager manager: Scripts manager.
+        """
+        self.imsi = imsi
+        self.mission = mission
+        self.manager = manager
+        self.main_task = asyncio.create_task(self._wrapped_run())
 
     def log(self, log: str) -> None:
         """
@@ -61,11 +71,10 @@ class AbstractScript(ABC):
         self.manager.handle_script_log(self, time, log)
 
     @abstractmethod
-    async def clean(self) -> None:
+    async def run(self) -> None:
         """
-        Script specific cleaning operation.
+        Script's main logic.
         """
-        pass
 
     def handle_new_uu_packet(self, rnti: int, packet) -> None:
         """
@@ -90,3 +99,17 @@ class AbstractScript(ABC):
                     return packet
             except (KeyError, AttributeError):
                 pass
+
+    async def _wrapped_run(self):
+        try:
+            self.status = ScriptStatus.STARTED
+            await self.run()
+        except asyncio.CancelledError:
+            self.status = ScriptStatus.STOPPED
+        except Exception as e:
+            self.log(str(e))
+            self.status = ScriptStatus.ERROR
+        else:
+            self.status = ScriptStatus.COMPLETED
+        self.stopped = True
+        self.stop_time = datetime.now()

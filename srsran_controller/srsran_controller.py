@@ -65,14 +65,24 @@ class SrsranController:
         self._current_mission = None
         self.logger.debug('Mission stopped successfully')
 
+    async def run_script(self, script, imsi):
+        """
+        Run a script for a UE.
+        :param srsran_controller.scripts.abstract.AbstractScript script: Script to run.
+        :param imsi: UE's IMSI.
+        """
+        self._assert_mission_running()
+        await self.scripts_manager.start_script(script, imsi, self.current_mission)
+
     async def ping(self, imsi: str) -> Ping:
         """
         Ping a UE.
         :param imsi: UE's IMSI.
         :return: Ping object.
         """
-        self._assert_mission_running()
-        return await self.scripts_manager.start_script(Ping.create, imsi, self.current_mission)
+        ping = Ping()
+        await self.run_script(ping, imsi)
+        return ping
 
     async def scan(self, band: int, device_name: str = 'UHD', device_args: str = ''):
         """

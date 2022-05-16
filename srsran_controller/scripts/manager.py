@@ -12,19 +12,16 @@ class ScriptsManager:
         self.script_status_callback = lambda script: None
         self.script_log_callback = lambda script, time, log: None
 
-    async def start_script(self, factory, imsi: str, mission):
+    async def start_script(self, script, imsi: str, mission):
         """
         Start a script.
-        :param factory: Coroutine to create script with.
+        :param srsran_controller.scripts.abstract.AbstractScript script: Script to start.
         :param imsi: Script subject's IMSI.
         :param mission: Current mission.
-        :return: Created script.
-        :rtype: srsran_controller.scripts.abstract.AbstractScript
         """
-        script = await factory(imsi, mission, self)
-        self.logger.info(f'Starting script id {script.id} on {imsi}')
         self.scripts.append(script)
-        return script
+        self.logger.info(f'Starting script id {script.id} on {imsi}')
+        await script.start(imsi, mission, self)
 
     async def stop_script(self, id_: str) -> None:
         """
