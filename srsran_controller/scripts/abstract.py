@@ -53,7 +53,7 @@ class AbstractScript(ABC):
         """
         :param imsi: UE's IMSI.
         :param srsran_controller.mission.mission.Mission mission: Current mission.
-        :param srsran_controller.scripts.manager.ScriptsManager manager: Scripts manager.
+        :param srsran_controller.scripts.executor.ScriptsExecutor manager: Scripts manager.
         """
         self.imsi = imsi
         self.mission = mission

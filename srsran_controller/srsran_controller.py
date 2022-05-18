@@ -8,7 +8,7 @@ from srsran_controller.configurations_manager import ConfigurationsManager
 from srsran_controller.mission.mission import Mission
 from srsran_controller.mission_factory.mission import create as create_mission
 from srsran_controller.scan.scanner import Scanner
-from srsran_controller.scripts.manager import ScriptsManager
+from srsran_controller.scripts.executor import ScriptsExecutor
 from srsran_controller.scripts.ping import Ping
 from srsran_controller.subscribers_manager import SubscribersManager
 
@@ -23,7 +23,7 @@ class SrsranController:
         pathlib.Path(config.missions_configurations_folder).mkdir(parents=True, exist_ok=True)
         self.subscribers = SubscribersManager()
         self.scanner = Scanner()
-        self.scripts_manager = ScriptsManager()
+        self.scripts_executor = ScriptsExecutor()
         self._current_mission = None
         self._scanning_task = None  # type: asyncio.Task | None
 
@@ -50,7 +50,7 @@ class SrsranController:
             raise exceptions.MissionAlreadyRunningError()
 
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
-        self._current_mission.uu_packets_callback = self.scripts_manager.handle_new_uu_packet
+        self._current_mission.uu_packets_callback = self.scripts_executor.handle_new_uu_packet
         self.logger.debug('Mission launched successfully')
         return self._current_mission
 
@@ -60,7 +60,7 @@ class SrsranController:
         """
         self.logger.info('Stopping current mission')
         self._assert_mission_running()
-        await self.scripts_manager.stop_all()
+        await self.scripts_executor.stop_all()
         await self.current_mission.stop()
         self._current_mission = None
         self.logger.debug('Mission stopped successfully')
@@ -72,7 +72,7 @@ class SrsranController:
         :param imsi: UE's IMSI.
         """
         self._assert_mission_running()
-        await self.scripts_manager.start_script(script, imsi, self.current_mission)
+        await self.scripts_executor.start_script(script, imsi, self.current_mission)
 
     async def ping(self, imsi: str) -> Ping:
         """
