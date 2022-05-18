@@ -20,7 +20,7 @@ class AbstractScript(ABC):
         self._logger = getLogger('srsran_controller')
         self.imsi = None
         self.mission = None
-        self.manager = None
+        self.executor = None
         self.stopped = False
         self.id = str(uuid4())
         self.logs = []
@@ -38,7 +38,7 @@ class AbstractScript(ABC):
     def status(self, value: ScriptStatus):
         self._status = value
         self._logger.info(f'Script id {self.id} - status change: {value}')
-        self.manager.handle_script_status(self)
+        self.executor.handle_script_status(self)
 
     async def stop(self) -> None:
         """
@@ -49,15 +49,15 @@ class AbstractScript(ABC):
         self.stopped = True
         self.main_task.cancel()
 
-    async def start(self, imsi: str, mission, manager) -> None:
+    async def start(self, imsi: str, mission, executor) -> None:
         """
         :param imsi: UE's IMSI.
         :param srsran_controller.mission.mission.Mission mission: Current mission.
-        :param srsran_controller.scripts.executor.ScriptsExecutor manager: Scripts manager.
+        :param srsran_controller.scripts.executor.ScriptsExecutor executor: Scripts executor.
         """
         self.imsi = imsi
         self.mission = mission
-        self.manager = manager
+        self.executor = executor
         self.main_task = asyncio.create_task(self._wrapped_run())
 
     def log(self, log: str) -> None:
@@ -68,7 +68,7 @@ class AbstractScript(ABC):
         self._logger.info(f'Script id {self.id} - log: {log}')
         time = datetime.now()
         self.logs.append((time, log))
-        self.manager.handle_script_log(self, time, log)
+        self.executor.handle_script_log(self, time, log)
 
     @abstractmethod
     async def run(self) -> None:
