@@ -5,7 +5,7 @@ from logging import getLogger
 CRNTI_TYPE = 3
 
 
-class ScriptsManager:
+class ScriptsExecutor:
     def __init__(self):
         self.scripts = []
         self.logger = getLogger('srsran_controller')
