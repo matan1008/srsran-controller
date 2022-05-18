@@ -19,7 +19,7 @@ class ChannelMetadata:
 
 class ChannelTracker:
     def __init__(self):
-        self._rnti_channels = {}
+        self.rnti_channels = {}
         self._events_handlers = {
             ATTACH_ACCEPT_NAME: self._handle_attach_accept,
             ATTACH_REQUEST_NAME: self._handle_attach_request,
@@ -36,7 +36,7 @@ class ChannelTracker:
         :param imsi: Subscriber's IMSI.
         :return: Subscriber's IP.
         """
-        for channel in self._rnti_channels.values():
+        for channel in self.rnti_channels.values():
             if channel.imsi == imsi:
                 return channel.ip
 
@@ -46,7 +46,7 @@ class ChannelTracker:
         :param rnti: C-RNTI of the request channel.
         :return: All known metadata about the channel.
         """
-        return self._rnti_channels[rnti]
+        return self.rnti_channels[rnti]
 
     def enrich_event(self, event: dict) -> None:
         """
@@ -55,7 +55,7 @@ class ChannelTracker:
         """
         if 'rnti' not in event:
             return
-        channel_metadata = self._rnti_channels[event['rnti']]
+        channel_metadata = self.rnti_channels[event['rnti']]
         if 'ta' not in event:
             event['ta'] = channel_metadata.ta
         if 'imsi' not in event and channel_metadata.imsi:
@@ -75,10 +75,10 @@ class ChannelTracker:
         self._events_handlers[event['event']](event)
 
     def _handle_rar(self, event: dict):
-        self._rnti_channels[event['c-rnti']] = ChannelMetadata(ta=event['ta'])
+        self.rnti_channels[event['c-rnti']] = ChannelMetadata(ta=event['ta'])
 
     def _handle_attach_accept(self, event: dict):
-        self._rnti_channels[event['rnti']].ip = event['ip']
+        self.rnti_channels[event['rnti']].ip = event['ip']
         self._set_imsi(event)
 
     def _handle_attach_request(self, event: dict):
@@ -86,7 +86,7 @@ class ChannelTracker:
 
     def _handle_security_mode_complete(self, event: dict):
         if 'imeisv' in event:
-            self._rnti_channels[event['rnti']].imeisv = event['imeisv']
+            self.rnti_channels[event['rnti']].imeisv = event['imeisv']
 
     def _handle_connection_request(self, event: dict):
         self._set_imsi(event)
@@ -95,17 +95,17 @@ class ChannelTracker:
         self._set_imsi(event)
 
     def _handle_connection_reesttablishment_request(self, event: dict):
-        self._rnti_channels[event['rnti']] = self._rnti_channels.pop(event['c-rnti'])
+        self.rnti_channels[event['rnti']] = self.rnti_channels.pop(event['c-rnti'])
 
     def _set_imsi(self, event: dict):
         if 'imsi' not in event:
             return
-        self._rnti_channels[event['rnti']].imsi = event['imsi']
+        self.rnti_channels[event['rnti']].imsi = event['imsi']
         # Remove old channels related to this imsi.
-        for old_rnti in list(self._rnti_channels.keys()):
-            if self._rnti_channels[old_rnti].imsi == event['imsi'] and old_rnti != event['rnti']:
-                if self._rnti_channels[old_rnti].imeisv and not self._rnti_channels[event['rnti']].imeisv:
-                    self._rnti_channels[event['rnti']].imeisv = self._rnti_channels[old_rnti].imeisv
-                if self._rnti_channels[old_rnti].ip and not self._rnti_channels[event['rnti']].ip:
-                    self._rnti_channels[event['rnti']].ip = self._rnti_channels[old_rnti].ip
-                del self._rnti_channels[old_rnti]
+        for old_rnti in list(self.rnti_channels.keys()):
+            if self.rnti_channels[old_rnti].imsi == event['imsi'] and old_rnti != event['rnti']:
+                if self.rnti_channels[old_rnti].imeisv and not self.rnti_channels[event['rnti']].imeisv:
+                    self.rnti_channels[event['rnti']].imeisv = self.rnti_channels[old_rnti].imeisv
+                if self.rnti_channels[old_rnti].ip and not self.rnti_channels[event['rnti']].ip:
+                    self.rnti_channels[event['rnti']].ip = self.rnti_channels[old_rnti].ip
+                del self.rnti_channels[old_rnti]
