@@ -8,6 +8,7 @@ class Configuration:
     Global scoped configuration.
     """
     missions_configurations_folder: str
+    scripts_folder: str
     current_epc_configuration: str
     current_enb_configuration: str
     current_enb_sibs_configuration: str
@@ -36,6 +37,7 @@ class Configuration:
 
 config = Configuration(
     missions_configurations_folder='',
+    scripts_folder='',
     current_epc_configuration='',
     current_enb_configuration='',
     current_enb_sibs_configuration='',

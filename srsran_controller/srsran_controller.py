@@ -9,6 +9,7 @@ from srsran_controller.mission.mission import Mission
 from srsran_controller.mission_factory.mission import create as create_mission
 from srsran_controller.scan.scanner import Scanner
 from srsran_controller.scripts.executor import ScriptsExecutor
+from srsran_controller.scripts.importer import ScriptsImporter
 from srsran_controller.scripts.ping import Ping
 from srsran_controller.subscribers_manager import SubscribersManager
 
@@ -24,6 +25,8 @@ class SrsranController:
         self.subscribers = SubscribersManager()
         self.scanner = Scanner()
         self.scripts_executor = ScriptsExecutor()
+        self.scripts_importer = ScriptsImporter(config.scripts_folder)
+        pathlib.Path(config.scripts_folder).mkdir(parents=True, exist_ok=True)
         self._current_mission = None
         self._scanning_task = None  # type: asyncio.Task | None
 

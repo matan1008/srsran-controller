@@ -30,6 +30,11 @@ class AbstractScript(ABC):
         self.uu_queue = Queue()
         self.main_task = None
 
+    @classmethod
+    @property
+    def name(cls):
+        return str(cls)
+
     @property
     def status(self):
         return self._status
