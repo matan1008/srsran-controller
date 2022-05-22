@@ -2,3 +2,4 @@ docker
 pyshark
 netifaces
 libconf
+pycrate
