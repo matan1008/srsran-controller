@@ -31,3 +31,8 @@ class ScanIsNotRunningError(SrsranControllerException):
 class ScanInterruptedError(SrsranControllerException):
     """ Raise when scan is interrupted. """
     pass
+
+
+class UnknownScriptError(SrsranControllerException):
+    """ Raise when trying to get script class of an unknown script. """
+    pass

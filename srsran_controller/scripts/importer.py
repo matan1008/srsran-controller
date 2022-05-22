@@ -2,6 +2,8 @@ import importlib.util
 from logging import Logger, getLogger
 from pathlib import Path
 
+from srsran_controller.exceptions import UnknownScriptError
+
 
 class ScriptsImporter:
     def __init__(self, scripts_folder: str, logger: Logger = getLogger('srsran_controller')):
@@ -36,7 +38,10 @@ class ScriptsImporter:
         :return: Script's class.
         :rtype: type[srsran_controller.scripts.abstract.AbstractScript]
         """
-        return self._scripts_classes[name]
+        try:
+            return self._scripts_classes[name]
+        except KeyError as e:
+            raise UnknownScriptError from e
 
     def _load_script_class_from_file(self, file):
         """
