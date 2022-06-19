@@ -18,7 +18,7 @@ def test_parsing_connection_request_with_tmsi(tmp_path):
         connection_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert connection_request == {
         'event': CONNECTION_REQUEST_NAME,
-        'tmsi': '1c1192e7',
+        'tmsi': 0x1c1192e7,
         'rnti': 71,
         'time': datetime.datetime(2021, 4, 30, 12, 17, 7, 584007),
     }

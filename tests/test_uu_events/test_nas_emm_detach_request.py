@@ -25,7 +25,7 @@ def test_parsing_emm_detach_request(tmp_path):
     with FileCapture(str(p)) as pcap:
         detach = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert detach == {
-        'tmsi': '0x1c1192e7',
+        'tmsi': 0x1c1192e7,
         'event': 'Detach request',
         'rnti': 71,
         'time': datetime.datetime(2021, 4, 30, 12, 17, 17, 241485),

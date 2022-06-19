@@ -10,7 +10,7 @@ def create(pkt):
             return
         identity = {}
         if hasattr(mac_layer, RRC_TMSI_TAG):
-            identity = {'tmsi': mac_layer.lte_rrc_m_tmsi.raw_value}
+            identity = {'tmsi': mac_layer.lte_rrc_m_tmsi.hex_value}
         if not identity:
             return
         event = {

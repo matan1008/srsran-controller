@@ -27,7 +27,7 @@ def test_parsing_emm_attach_accept(tmp_path):
         attach_accept = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_accept == {
         'ip': '172.16.0.2',
-        'tmsi': '0x53d764bc',
+        'tmsi': 0x53d764bc,
         'event': ATTACH_ACCEPT_NAME,
         'rnti': 70,
         'time': datetime.datetime(2021, 8, 20, 17, 16, 35, 111101),

@@ -48,6 +48,7 @@ def test_parsing_emm_attach_request_imsi(tmp_path):
         'event': ATTACH_REQUEST_NAME,
         'rnti': 70,
         'time': datetime.datetime(2021, 4, 30, 11, 59, 54, 288054),
+        'data': {},
     }
 
 
@@ -57,8 +58,12 @@ def test_parsing_emm_attach_request_tmsi(tmp_path):
     with FileCapture(str(p)) as pcap:
         attach_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_request == {
-        'tmsi': '0x20e839a0',
+        'tmsi': 0x20e839a0,
         'event': ATTACH_REQUEST_NAME,
         'rnti': 133,
+        'data': {
+            'old_lai': {'mcc': '901', 'mnc': '70', 'lac': 1},
+            'old_tai': {'mcc': '901', 'mnc': '70', 'tac': 8},
+        },
         'time': datetime.datetime(2021, 10, 28, 8, 39, 18, 700691),
     }
