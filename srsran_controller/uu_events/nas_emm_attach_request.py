@@ -20,6 +20,22 @@ def create(pkt):
             # Unknown identity.
             return
 
-            return event
+        data = {}
+        if hasattr(mac_layer, 'nas_eps.emm.tai_tac'):
+            data['old_tai'] = {
+                'mcc': '{:>03}'.format(getattr(mac_layer, 'e212.tai.mcc')),
+                'mnc': '{:>02}'.format(getattr(mac_layer, 'e212.tai.mnc')),
+                'tac': int(getattr(mac_layer, 'nas_eps.emm.tai_tac')),
+            }
+        if hasattr(mac_layer, 'gsm_a.lac'):
+            data['old_lai'] = {
+                'mcc': '{:>03}'.format(getattr(mac_layer, 'e212.lai.mcc')),
+                'mnc': '{:>02}'.format(getattr(mac_layer, 'e212.lai.mnc')),
+                'lac': int(getattr(mac_layer, 'gsm_a.lac'), 0),
+            }
+
+        event['data'] = data
+
+        return event
     except (KeyError, AttributeError):
         pass
