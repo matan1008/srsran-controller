@@ -43,13 +43,13 @@ class Epc(Entity):
         epc._disconnect('none')
         return epc
 
-    async def imsi_from_tmsi(self, tmsi: str) -> str:
+    async def imsi_from_tmsi(self, tmsi: int) -> str:
         """
         Fetch an IMSI of a TMSI from the EPC.
         :param tmsi: Known TMSI.
         :return: IMSI if known, else empty string.
         """
-        request = b'find_imsi_from_tmsi ' + struct.pack('<I', int(tmsi, 16))
+        request = b'find_imsi_from_tmsi ' + struct.pack('<I', tmsi)
         response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
         imsi, = struct.unpack('<Q', response)
         if not imsi:
