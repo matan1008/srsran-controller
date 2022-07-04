@@ -95,6 +95,8 @@ class ChannelTracker:
         self._set_imsi(event)
 
     def _handle_connection_reesttablishment_request(self, event: dict):
+        if event['c-rnti'] not in self.rnti_channels:
+            return
         self.rnti_channels[event['rnti']] = self.rnti_channels.pop(event['c-rnti'])
 
     def _set_imsi(self, event: dict):
