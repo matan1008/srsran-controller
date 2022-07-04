@@ -59,7 +59,7 @@ class Epc(Entity):
     async def send_downlink_nas_transport(self, imsi: str, data: bytes) -> None:
         """
         Send downlink NAS transport.
-        :param imsi: UE's IMEI.
+        :param imsi: UE's IMSI.
         :param data: CP data to send.
         """
         request = b'send_downlink_nas_transport '
