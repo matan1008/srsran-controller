@@ -68,6 +68,22 @@ class Epc(Entity):
         if response != b'\x00':
             raise EntityControlError()
 
+    async def send_downlink_generic_nas_transport(self, imsi: str, type_: int, data: bytes,
+                                                  additional_information: bytes = b'') -> None:
+        """
+        Send downlink generic NAS transport.
+        :param imsi: UE's IMSI.
+        :param type_: Message container type. 1 for LPP, 2 for location service, etc.
+        :param data: Message container data.
+        :param additional_information: Message additional information.
+        """
+        request = b'send_downlink_generic_nas_transport '
+        request += struct.pack('<QBH', int(imsi), type_, len(data)) + data
+        request += struct.pack('<B', len(additional_information)) + additional_information
+        response = await asyncio_udp_send_receive(request, self.ip, self.CONTROL_PORT)
+        if response != b'\x00':
+            raise EntityControlError()
+
     async def send_paging(self, imsi: str) -> None:
         """
         Send paging.
