@@ -21,7 +21,7 @@ class ScriptsImporter:
                 continue
             try:
                 class_ = self._load_script_class_from_file(module)
-                self._scripts_classes[class_.name] = class_
+                self._scripts_classes[class_.get_name()] = class_
             except Exception:  # noqa
                 self.logger.warning(f'Error loading script {module}')
 

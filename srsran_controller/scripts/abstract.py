@@ -31,9 +31,8 @@ class AbstractScript(ABC):
         self.main_task = None
 
     @classmethod
-    @property
-    def name(cls):
-        return str(cls)
+    def get_name(cls):
+        return getattr(cls, 'NAME', str(cls.__name__))
 
     @property
     def status(self):
