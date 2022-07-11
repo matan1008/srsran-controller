@@ -1,44 +1,37 @@
-from srsran_controller.common.pyshark import items_in_tree
+from srsran_controller.common.pyshark import rrc_get
 from srsran_controller.uu_events.common import Q_OFFSET_RANGE_ENUM
 
 SIB4_NAME = 'System Information Block 4'
 
 
-def parse_neighbours(sib4):
+def parse_neighbours(lte_rrc):
     neighbours = []
-    for info in items_in_tree(sib4, 'intraFreqNeighCellList', 'IntraFreqNeighCellInfo_element'):
+    for i in range(int(rrc_get(lte_rrc, 'intraFreqNeighCellList'))):
         neighbours.append({
-            'physical_cell_id': int(info.physCellId),
-            'q_offset_cell': Q_OFFSET_RANGE_ENUM[int(info.q_OffsetCell)],
+            'physical_cell_id': int(rrc_get(lte_rrc, 'physCellId')[i]),
+            'q_offset_cell': Q_OFFSET_RANGE_ENUM[int(rrc_get(lte_rrc, 'q_OffsetCell')[i])],
         })
     return neighbours
 
 
-def parse_black_cell(sib4):
-    black_cells = []
-    for id_range in items_in_tree(sib4, 'intraFreqBlackCellList', 'PhysCellIdRange_element'):
-        black_cells.append({
-            'start': int(id_range.start),
-        })
-    return black_cells
+def parse_black_cell(lte_rrc):
+    try:
+        return [int(start) for start in rrc_get(lte_rrc, 'start')]
+    except KeyError:
+        return []
 
 
 def create(pkt):
     try:
-        c1 = pkt['mac-lte'].lte_rrc.BCCH_DL_SCH_Message_element.message_tree.c1_tree
-        sys_info_element = c1.systemInformation_element.criticalExtensions_tree.systemInformation_r8_element
-        sib4 = [
-            sib
-            for sib
-            in items_in_tree(sys_info_element, 'sib_TypeAndInfo', 'sib_TypeAndInfo_item_tree')
-            if sib.has_field('sib4_element')
-        ][0].sib4_element
+        lte_rrc = pkt['mac-lte'].lte_rrc
+        if 'lte_rrc_lte-rrc_sib4_element' not in lte_rrc:
+            return
 
         return {
             'event': SIB4_NAME,
             'data': {
-                'intra_freq_neigh_cell_list': parse_neighbours(sib4),
-                'intra_freq_black_cell_list': parse_black_cell(sib4),
+                'intra_freq_neigh_cell_list': parse_neighbours(lte_rrc),
+                'intra_freq_black_cell_list': parse_black_cell(lte_rrc),
             },
         }
     except (KeyError, AttributeError, IndexError):

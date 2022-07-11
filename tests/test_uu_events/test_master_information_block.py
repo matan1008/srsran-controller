@@ -21,13 +21,13 @@ GSM_MIB_DATA = (
 def test_parsing_mib(tmp_path):
     p = tmp_path / 'mib.pcap'
     p.write_bytes(bytes.fromhex(GSM_MIB_DATA))
-    with FileCapture(str(p), use_json=True) as pcap:
+    with FileCapture(str(p), use_ek=True) as pcap:
         mib = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert mib == {
         'event': MIB_NAME,
         'data': {
             'phich_duration': 'normal',
-            'phich_resource': '1/6',
+            'phich_resource': '1/2',
             'downlink_bandwidth': 75,
         },
         'time': datetime.datetime(2021, 10, 12, 14, 20, 24, 696270)

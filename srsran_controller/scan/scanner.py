@@ -113,7 +113,7 @@ class Scanner:
         raw_sibs = []
         with self._run_cell_sniffer(cell['earfcn'], cell['cell_id']):
             sniffer = UuSniffer(find_interface_of_address(SibsScanner.CLIENT_IP), SibsScanner.CLIENT_IP)
-            packet_generator = sniffer.start(use_json=True)
+            packet_generator = sniffer.start(use_ek=True)
             try:
                 await asyncio.wait_for(self._sniff_cell_sibs(packet_generator, sibs, raw_sibs), self.SIBS_SCAN_TIMEOUT)
             except asyncio.TimeoutError:
@@ -161,7 +161,7 @@ class Scanner:
         events_factory = EventsFactory()
         async for packet in packet_generator:
             if 'mac-lte' in packet:
-                raw_packets.append(packet['mac-lte']._all_fields)
+                raw_packets.append(packet['mac-lte']._fields_dict)
             for event in events_factory.from_packet(packet):
                 if event['event'] not in SIB_NAMES:
                     continue

@@ -13,7 +13,7 @@ class UuSniffer:
         self._addr = addr
         self._port = port
 
-    async def start(self, use_json: bool = False):
+    async def start(self, use_ek: bool = False):
         """
         Start tracking the Uu interface for new packets.
         :rtype: types.AsyncGeneratorType
@@ -22,7 +22,7 @@ class UuSniffer:
         with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as sock:
             sock.bind((self._addr, self._port))
             packet_queue = asyncio.Queue()
-            async with LiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface, use_json=use_json,
+            async with LiveCapture(bpf_filter=f'udp port {self._port}', interface=self._interface, use_ek=use_ek,
                                    eventloop=asyncio.get_event_loop()) as cap:
                 cap_task = asyncio.create_task(cap.packets_from_tshark(packet_queue.put_nowait))
                 try:

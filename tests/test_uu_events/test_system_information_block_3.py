@@ -22,7 +22,7 @@ SIB23_DATA = (
 def test_parsing_sib3(tmp_path):
     p = tmp_path / 'sib3.pcap'
     p.write_bytes(bytes.fromhex(SIB23_DATA))
-    with FileCapture(str(p), use_json=True) as pcap:
+    with FileCapture(str(p), use_ek=True) as pcap:
         sib3 = list(EventsFactory().from_packet(list(pcap)[0]))[1]
     assert sib3 == {
         'event': SIB3_NAME,
