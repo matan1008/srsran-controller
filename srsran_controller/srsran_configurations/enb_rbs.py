@@ -82,4 +82,6 @@ class SrsEnbRbs:
         libconf.dump({
             'qci_config': tuple(config.to_dict() for config in self.qci_config),
             'five_qi_config': (),
+            'srb1_5g_config': {'rlc_config': {}},
+            'srb2_5g_config': {'rlc_config': {}},
         }, fd)
