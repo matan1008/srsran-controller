@@ -31,7 +31,7 @@ class SrsEnbRfConfiguration:
     device_name: str = 'auto'
     device_args: str = 'auto'
     time_adv_nsamples: str = 'auto'
-    tx_gain: int = 80
+    tx_gain: int = 200
     rx_gain: int = 40
 
 
