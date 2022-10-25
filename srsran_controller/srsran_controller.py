@@ -11,6 +11,7 @@ from srsran_controller.scan.scanner import Scanner
 from srsran_controller.scripts.executor import ScriptsExecutor
 from srsran_controller.scripts.importer import ScriptsImporter
 from srsran_controller.scripts.ping import Ping
+from srsran_controller.subject import Subject
 from srsran_controller.subscribers_manager import SubscribersManager
 
 
@@ -29,6 +30,14 @@ class SrsranController:
         pathlib.Path(config.scripts_folder).mkdir(parents=True, exist_ok=True)
         self._current_mission = None
         self._scanning_task = None  # type: asyncio.Task | None
+        # Subjects
+        self.events_subject = Subject()
+        self.scan_progress_subject = Subject()
+        self.script_status_subject = Subject()
+        self.script_log_subject = Subject()
+        self.scanner.scan_progress_callback = self._handle_scan_progress
+        self.scripts_executor.script_status_callback = self._handle_script_status
+        self.scripts_executor.script_log_callback = self._handle_script_log
 
     @property
     def current_mission(self) -> Mission:
@@ -54,6 +63,7 @@ class SrsranController:
 
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
         self._current_mission.uu_packets_callback = self.scripts_executor.handle_new_uu_packet
+        self.current_mission.uu_events_callback = self._handle_uu_event
         self.logger.debug('Mission launched successfully')
         return self._current_mission
 
@@ -115,3 +125,15 @@ class SrsranController:
         if self.current_mission is None:
             self.logger.warning('Mission is not running')
             raise exceptions.MissionIsNotRunningError()
+
+    def _handle_uu_event(self, event):
+        self.events_subject.notify(event)
+
+    def _handle_scan_progress(self, scanner):
+        self.scan_progress_subject.notify(scanner)
+
+    def _handle_script_status(self, script):
+        self.script_status_subject.notify(script)
+
+    def _handle_script_log(self, script, time, log):
+        self.script_log_subject.notify((script, time, log))
