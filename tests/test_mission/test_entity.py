@@ -26,7 +26,10 @@ def test_shutting_down_removed_container(container):
     client = docker.from_env()
     entity = Entity(container)
     container.kill()
-    container.wait(condition='removed')
+    try:
+        container.wait(condition='removed')
+    except NotFound:
+        pass
     entity.shutdown()
     with pytest.raises(NotFound):
         assert client.containers.get(container.id)
