@@ -7,6 +7,7 @@ from srsran_controller.configuration import config
 from srsran_controller.configurations_manager import ConfigurationsManager
 from srsran_controller.mission.mission import Mission
 from srsran_controller.mission_factory.mission import create as create_mission
+from srsran_controller.products import Products
 from srsran_controller.scan.scanner import Scanner
 from srsran_controller.scripts.executor import ScriptsExecutor
 from srsran_controller.scripts.importer import ScriptsImporter
@@ -30,6 +31,7 @@ class SrsranController:
         pathlib.Path(config.scripts_folder).mkdir(parents=True, exist_ok=True)
         self._current_mission = None
         self._scanning_task = None  # type: asyncio.Task | None
+        self.products = Products(config.products_folder)
         # Subjects
         self.events_subject = Subject()
         self.scan_progress_subject = Subject()
@@ -64,6 +66,7 @@ class SrsranController:
         self._current_mission = await create_mission(self.configurations.get_mission(mission_configuration_id))
         self._current_mission.uu_packets_callback = self.scripts_executor.handle_new_uu_packet
         self.current_mission.uu_events_callback = self._handle_uu_event
+        self.products.set_mission(self.current_mission)
         self.logger.debug('Mission launched successfully')
         return self._current_mission
 
@@ -127,6 +130,7 @@ class SrsranController:
             raise exceptions.MissionIsNotRunningError()
 
     def _handle_uu_event(self, event):
+        self.products.write_event(event)
         self.events_subject.notify(event)
 
     def _handle_scan_progress(self, scanner):

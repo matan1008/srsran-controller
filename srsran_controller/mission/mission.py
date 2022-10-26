@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 from logging import Logger, getLogger
+from uuid import uuid4
 
 from srsran_controller.mission.channel_tracker import ChannelTracker
 from srsran_controller.uu_events.factory import EventsFactory
@@ -18,6 +19,7 @@ class Mission:
         :param srsran_controller.mission.pgw_network.PgwNetwork pgw_network: P-GW network.
         :param logger: Logger.
         """
+        self.id = str(uuid4())
         self.uu_events = []
         self.uu_events_callback = lambda event: None
         self.uu_packets_callback = lambda event: None
