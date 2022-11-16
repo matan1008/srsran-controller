@@ -111,7 +111,7 @@ class Scanner:
         )
         sibs = {}
         raw_sibs = []
-        with self._run_cell_sniffer(cell['earfcn'], cell['cell_id']):
+        with self._run_cell_sniffer(cell['earfcn'], cell['cell_id'], device_args):
             sniffer = UuSniffer(find_interface_of_address(SibsScanner.CLIENT_IP), SibsScanner.CLIENT_IP)
             packet_generator = sniffer.start(use_json=True)
             try:
@@ -150,8 +150,8 @@ class Scanner:
             scanner.shutdown()
 
     @contextmanager
-    def _run_cell_sniffer(self, earfcn, cell_id):
-        sibs_sniffer = create_sibs_sniffer(earfcn, cell_id, self.SCAN_GAIN)
+    def _run_cell_sniffer(self, earfcn, cell_id, device_args):
+        sibs_sniffer = create_sibs_sniffer(earfcn, cell_id, self.SCAN_GAIN, device_args)
         try:
             yield
         finally:
