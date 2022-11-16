@@ -75,6 +75,7 @@ class Scanner:
         self._handle_scan_progress(0, 0, ScanState.SIGNALS)
         try:
             cells = await self.scan_sync_signal(band, device_name, device_args)
+            cells.sort(key=lambda c: c['cell_id'] <= 2)
             for i, cell in enumerate(cells):
                 self._handle_scan_progress(i, len(cells), ScanState.SIBS)
                 await self.scan_cell(cell, device_args)
