@@ -41,7 +41,7 @@ ATTACH_REQUEST_TMSI_PCAP_DATA = (
 def test_parsing_emm_attach_request_imsi(tmp_path):
     p = tmp_path / 'attach_request.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_REQUEST_IMSI_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         attach_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_request == {
         'imsi': '001010123456789',
@@ -55,7 +55,7 @@ def test_parsing_emm_attach_request_imsi(tmp_path):
 def test_parsing_emm_attach_request_tmsi(tmp_path):
     p = tmp_path / 'attach_request.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_REQUEST_TMSI_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         attach_request = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_request == {
         'tmsi': 0x20e839a0,

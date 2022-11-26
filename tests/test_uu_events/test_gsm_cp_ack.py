@@ -30,7 +30,7 @@ GSM_CP_ACK_PCAP_DATA = (
 def test_parsing_gsm_cp_ack(tmp_path):
     p = tmp_path / 'gsm_cp_ack.pcap'
     p.write_bytes(bytes.fromhex(GSM_CP_ACK_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         cp_ack = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert cp_ack == {
         'event': GSM_CP_ACK_NAME,
