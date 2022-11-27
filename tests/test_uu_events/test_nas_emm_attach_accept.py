@@ -23,7 +23,7 @@ ATTACH_ACCEPT_PCAP_DATA_IMSI = (
 def test_parsing_emm_attach_accept(tmp_path):
     p = tmp_path / 'attach_accept.pcap'
     p.write_bytes(bytes.fromhex(ATTACH_ACCEPT_PCAP_DATA_IMSI))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         attach_accept = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert attach_accept == {
         'ip': '172.16.0.2',

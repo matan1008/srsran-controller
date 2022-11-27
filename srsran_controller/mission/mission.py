@@ -54,7 +54,7 @@ class Mission:
     async def _sniff_packets(self):
         events_factory = EventsFactory()
         sniffer = UuSniffer(self._lte_network.INTERFACE_NAME, self._lte_network.GATEWAY)
-        async for packet in sniffer.start():
+        async for packet in sniffer.start(use_json=True):
             self.uu_packets_callback(packet)
             for event in events_factory.from_packet(packet):
                 self._handle_uu_event(event)

@@ -31,7 +31,7 @@ SECURITY_MODE_COMPLETE_IMEI = (
 def test_parsing_emm_security_mode_complete_imei(tmp_path):
     p = tmp_path / 'security_mode_complete_imei.pcap'
     p.write_bytes(bytes.fromhex(SECURITY_MODE_COMPLETE_IMEI))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         security_mode_complete = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert security_mode_complete == {
         'imeisv': '3534900698733153',

@@ -22,7 +22,7 @@ DETACH_REQUEST_PCAP_DATA = (
 def test_parsing_emm_detach_request(tmp_path):
     p = tmp_path / 'detach_request.pcap'
     p.write_bytes(bytes.fromhex(DETACH_REQUEST_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         detach = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert detach == {
         'tmsi': 0x1c1192e7,

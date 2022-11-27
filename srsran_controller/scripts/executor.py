@@ -60,7 +60,7 @@ class ScriptsExecutor:
         Handle arrival of a new UU packet.
         """
         mac_layer = getattr(pkt, 'mac-lte', None)
-        if mac_layer is None or int(mac_layer.rnti_type) != CRNTI_TYPE:
+        if mac_layer is None or int(mac_layer.context_tree.get_field('rnti-type')) != CRNTI_TYPE:
             return
         for script in filter(lambda s: not s.stopped, self.scripts):
-            script.handle_new_uu_packet(int(mac_layer.rnti), pkt)
+            script.handle_new_uu_packet(int(mac_layer.context_tree.rnti), pkt)

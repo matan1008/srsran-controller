@@ -48,6 +48,11 @@ class EventsFactory:
 
     def from_packet(self, pkt):
         for creator in self.events_creators:
-            if (event := creator(pkt)) is not None:
+            events = creator(pkt)
+            if events is None:
+                continue
+            if isinstance(events, dict):
+                events = [events]
+            for event in events:
                 event['time'] = datetime.fromtimestamp(float(pkt.frame_info.time_epoch))
                 yield event

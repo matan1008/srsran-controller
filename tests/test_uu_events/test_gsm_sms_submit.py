@@ -52,7 +52,7 @@ GSM_SMS_SUBMIT_UTF16_PCAP_DATA = (
 def test_parsing_gsm_sms_submit(tmp_path):
     p = tmp_path / 'gsm_sms_submit.pcap'
     p.write_bytes(bytes.fromhex(GSM_SMS_SUBMIT_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         submit = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert submit == {
         'event': GSM_SMS_SUBMIT_NAME,
@@ -69,7 +69,7 @@ def test_parsing_gsm_sms_submit(tmp_path):
 def test_parsing_gsm_sms_submit_utf16(tmp_path):
     p = tmp_path / 'gsm_sms_submit.pcap'
     p.write_bytes(bytes.fromhex(GSM_SMS_SUBMIT_UTF16_PCAP_DATA))
-    with FileCapture(str(p)) as pcap:
+    with FileCapture(str(p), use_json=True) as pcap:
         submit = list(EventsFactory().from_packet(list(pcap)[0]))[0]
     assert submit == {
         'event': GSM_SMS_SUBMIT_NAME,
