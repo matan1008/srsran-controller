@@ -4,21 +4,16 @@ from pycrate_mobile.TS23040_SMS import *
 from pycrate_mobile.TS24011_PPSMS import *
 
 from srsran_controller.scripts.abstract import AbstractScript
-from srsran_controller.uu_events.gsm_cp_ack import CP_ACK_MTI
-from srsran_controller.uu_events.gsm_rp_ack import RP_ACK_MESSAGE_TYPE
+from srsran_controller.uu_events.gsm_cp_ack import create as create_gsm_cp_ack
+from srsran_controller.uu_events.gsm_rp_ack import create as create_gsm_rp_ack
 
 
 def is_cp_ack(pkt):
-    mac_lte = pkt['mac-lte']
-    return int(mac_lte.direction) == 0 and int(mac_lte.gsm_a_dtap_msg_sms_type, 0) == CP_ACK_MTI
+    return bool(create_gsm_cp_ack(pkt))
 
 
 def is_rp_ack(pkt):
-    try:
-        mac_lte = pkt['mac-lte']
-        return int(mac_lte.direction) == 0 and int(mac_lte.gsm_a_rp_msg_type, 0) == RP_ACK_MESSAGE_TYPE
-    except (KeyError, AttributeError):
-        return False
+    return bool(create_gsm_rp_ack(pkt))
 
 
 class Sms(AbstractScript):
