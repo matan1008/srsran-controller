@@ -25,6 +25,11 @@ class SrsEpcMmeConfiguration:
     paging_timer: int = 2
     request_imeisv: bool = True
 
+    def to_dict(self):
+        mme = asdict(self)
+        mme['tac'] = hex(mme['tac'])
+        return mme
+
 
 @dataclass
 class SrsEpcHssConfiguration:
@@ -83,7 +88,7 @@ class SrsEpcConfiguration:
 
     def write(self, fd: TextIO):
         config = configparser.ConfigParser()
-        config['mme'] = asdict(self.mme)
+        config['mme'] = self.mme.to_dict()
         config['hss'] = asdict(self.hss)
         config['spgw'] = asdict(self.spgw)
         config['pcap'] = asdict(self.pcap)
