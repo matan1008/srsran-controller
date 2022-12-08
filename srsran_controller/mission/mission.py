@@ -66,7 +66,8 @@ class Mission:
     async def _handle_uu_event(self, event):
         self.logger.debug(f'Handle Uu event: {event}')
         if 'imsi' not in event and 'tmsi' in event:
-            event['imsi'] = await self.epc.imsi_from_tmsi(event['tmsi'])
+            if imsi := await self.epc.imsi_from_tmsi(event['tmsi']):
+                event['imsi'] = imsi
         self.uu_events.append(event)
         self.channel_tracker.handle_uu_event(event)
         self.channel_tracker.enrich_event(event)
