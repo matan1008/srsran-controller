@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict, field
+from io import StringIO
 from typing import TextIO
 
 import libconf
@@ -115,3 +116,8 @@ class SrsEnbRR:
 
     def write(self, fd: TextIO):
         libconf.dump(asdict(self), fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()

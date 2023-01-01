@@ -1,5 +1,6 @@
 import configparser
 from dataclasses import dataclass, asdict, field
+from io import StringIO
 from typing import TextIO
 
 from srsran_controller.common.dataclasses import to_dict_without_none
@@ -104,3 +105,8 @@ class SrsUeConfiguration:
         config['log'] = self.log.to_dict()
         config['phy'] = asdict(self.phy)
         config.write(fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()
