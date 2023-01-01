@@ -56,26 +56,28 @@ def build_rbs():
     ))
 
 
-def build_rr(conf):
+def build_rr(conf, enb_index):
     """
     :param srsran_controller.mission.mission_configuration.MissionConfiguration conf:
+    :param enb_index: Index of current enb.
     """
+    cell = conf.cells[enb_index]
     return SrsEnbRR(
-        cell_list=tuple(SrsEnbRRCell(
-            cell_id=cell.cell_id, tac=conf.tac, pci=cell.pci, dl_earfcn=cell.earfcn, rf_port=i,
+        cell_list=(SrsEnbRRCell(
+            cell_id=cell.cell_id, tac=conf.tac, pci=cell.pci, dl_earfcn=cell.earfcn,
             meas_cell_list=(
                 SrsEnbRRCellListMeasCell(eci=(256 * conf.enb_id) + cell.cell_id, dl_earfcn=cell.earfcn, pci=cell.pci, ),
             ),
             meas_report_desc=SrsEnbRRCellListMeasReportDesc()
-        ) for i, cell in enumerate(conf.cells))
+        ),)
     )
 
 
 def build_rf_configuration(conf):
     """
-    :param srsran_controller.mission.mission_configuration.MissionConfiguration conf:
+    :param srsran_controller.mission.mission_configuration.EnbCell conf:
     """
-    args = conf.device_args
+    args = conf.device_args + ', ' + conf.device_serial
     if conf.device_name == 'zmq':
         args = (
             'fail_on_disconnect=true,'
@@ -84,41 +86,38 @@ def build_rf_configuration(conf):
     return SrsEnbRfConfiguration(device_name=conf.device_name, device_args=args)
 
 
-def build_configuration(conf, epc_ip, enb_ip):
+def build_configuration(conf, epc_ip, enb_ip, index_):
     return SrsEnbConfiguration(
         enb=SrsEnbEnbConfiguration(
-            enb_id=conf.enb_id, mcc=conf.mcc, mnc=conf.mnc, mme_addr=epc_ip, gtp_bind_addr=enb_ip,
+            enb_id=conf.enb_id + index_, mcc=conf.mcc, mnc=conf.mnc, mme_addr=epc_ip, gtp_bind_addr=enb_ip,
             s1c_bind_addr=enb_ip
         ),
         enb_files=SrsEnbEnbFilesConfiguration(sib_config=Enb.SIBS_CONF_CONTAINER_PATH,
                                               rr_config=Enb.RR_CONF_CONTAINER_PATH,
                                               rb_config=Enb.RBS_CONF_CONTAINER_PATH),
-        rf=build_rf_configuration(conf),
+        rf=build_rf_configuration(conf.cells[index_]),
         pcap=SrsEnbPcapConfiguration(mac_net_enable=True, client_ip=LteNetwork.GATEWAY),
         log=SrsEnbLogConfiguration(filename=Enb.LOG_CONTAINER_PATH)
     )
 
 
-def create(conf, lte_network, epc_ip, enb_ip):
+def create(conf, enb_index: int, lte_network, epc_ip, enb_ip):
     """
     Factory method for Enb objects.
     :param srsran_controller.mission.mission_configuration.MissionConfiguration conf: Mission configuration.
+    :param enb_index: Index of current enb.
     :param lte_network: Network to attach to.
     :param epc_ip: EPC IP inside the lte network.
     :param enb_ip: IP inside the lte network.
     :return: Launched Epc object.
     """
-    with open(config.current_enb_sibs_configuration, 'w') as fd:
-        build_sibs(conf).write(fd)
-    with open(config.current_enb_rbs_configuration, 'w') as fd:
-        build_rbs().write(fd)
-    with open(config.current_enb_rr_configuration, 'w') as fd:
-        build_rr(conf).write(fd)
-    with open(config.current_enb_configuration, 'w') as fd:
-        build_configuration(conf, epc_ip, enb_ip).write(fd)
+    config.current_enb_sibs_configuration[enb_index].write_text(str(build_sibs(conf)))
+    config.current_enb_rbs_configuration[enb_index].write_text(str(build_rbs()))
+    config.current_enb_rr_configuration[enb_index].write_text(str(build_rr(conf, enb_index)))
+    config.current_enb_configuration[enb_index].write_text(str(build_configuration(conf, epc_ip, enb_ip, enb_index)))
     enb = Enb.create(
-        config.current_enb_configuration, config.current_enb_sibs_configuration,
-        config.current_enb_rbs_configuration, config.current_enb_rr_configuration
+        config.current_enb_configuration[enb_index], config.current_enb_sibs_configuration[enb_index],
+        config.current_enb_rbs_configuration[enb_index], config.current_enb_rr_configuration[enb_index], enb_index
     )
     enb.connect(lte_network, enb_ip)
     enb.start()

@@ -26,13 +26,13 @@ def configuration_files(conf, epc_ip, enb_ip):
     rbs = NamedTemporaryFile(delete=True, mode='w')
     rr = NamedTemporaryFile(delete=True, mode='w')
     try:
-        build_configuration(conf, epc_ip, enb_ip).write(enb_conf)
+        build_configuration(conf, epc_ip, enb_ip, 0).write(enb_conf)
         enb_conf.flush()
         build_sibs(conf).write(sibs)
         sibs.flush()
         build_rbs().write(rbs)
         rbs.flush()
-        build_rr(conf).write(rr)
+        build_rr(conf, 0).write(rr)
         rr.flush()
         yield enb_conf.name, sibs.name, rbs.name, rr.name
     finally:
@@ -45,11 +45,12 @@ def configuration_files(conf, epc_ip, enb_ip):
 @contextmanager
 def launch_enb():
     epc_ip, enb_ip = map(str, list(IPv4Network(LteNetwork.SUBNET).hosts())[0:2])
-    conf = MissionConfiguration(device_name='zmq')
+    conf = MissionConfiguration()
+    conf.cells[0].device_name = 'zmq'
     with configuration_files(conf, epc_ip, enb_ip) as config_files:
         enb_conf, sibs, rbs, rr = config_files
         with shutdown(LteNetwork.create()) as lte_network:
-            with shutdown(Enb.create(enb_conf, sibs, rbs, rr)) as enb:
+            with shutdown(Enb.create(enb_conf, sibs, rbs, rr, 0)) as enb:
                 enb.connect(lte_network, enb_ip)
                 enb.start()
                 enb.wait_for_ip()

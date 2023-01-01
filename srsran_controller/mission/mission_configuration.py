@@ -7,6 +7,9 @@ class EnbCell:
     cell_id: int = 0x01
     pci: int = 1
     earfcn: int = 3350
+    device_name: str = 'UHD'
+    device_args: str = 'clock=gpsdo'
+    device_serial: str = ''
 
 
 @dataclass
@@ -34,8 +37,6 @@ class MissionConfiguration:
     mme_group: str = '0x0001'
     tac: int = 0x0007
     apn: str = 'internet'
-    device_name: str = 'UHD'
-    device_args: str = 'clock=gpsdo'
     enb_id: int = 0x19B
     full_net_name: str = 'Full network name'
     short_net_name: str = 'short'

@@ -10,11 +10,11 @@ from srsran_controller.uu_events.uu_sniffer import UuSniffer
 
 class Mission:
 
-    def __init__(self, epc, enb, lte_network, pgw_network=None, logger: Logger = getLogger('srsran_controller')):
+    def __init__(self, epc, enbs, lte_network, pgw_network=None, logger: Logger = getLogger('srsran_controller')):
         """
         Create a new mission object.
         :param srsran_controller.mission.epc.Epc epc: Mission's EPC.
-        :param srsran_controller.mission.enb.Enb enb: Mission's ENB.
+        :param list[srsran_controller.mission.enb.Enb] enbs: Mission's ENBs.
         :param srsran_controller.mission.lte_network.LteNetwork lte_network: Mission's network.
         :param srsran_controller.mission.pgw_network.PgwNetwork pgw_network: P-GW network.
         :param logger: Logger.
@@ -25,7 +25,8 @@ class Mission:
         self.uu_packets_callback = lambda event: None
         self.channel_tracker = ChannelTracker()
         self.epc = epc
-        self.enb = enb
+        self.enbs = enbs
+        self.enbs_ips = [enb.ip for enb in self.enbs]
         self._lte_network = lte_network
         self._pgw_network = pgw_network
         self.logger = logger
@@ -45,7 +46,8 @@ class Mission:
         """
         self._sniffing_task.cancel()
         await self._sniffing_task
-        self.enb.shutdown()
+        for enb in self.enbs:
+            enb.shutdown()
         self.epc.shutdown()
         self._lte_network.shutdown()
         if self._pgw_network is not None:
@@ -64,4 +66,5 @@ class Mission:
         self.uu_events.append(event)
         self.channel_tracker.handle_uu_event(event)
         self.channel_tracker.enrich_event(event)
+        event['enb'] = self.enbs_ips.index(event['enb_ip'])
         self.uu_events_callback(event)
