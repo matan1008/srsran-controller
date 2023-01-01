@@ -108,9 +108,7 @@ def test_updating_all_configuration_values(tmpdir):
     conf.short_net_name = 'new short'
     conf.gsm_neighbours = [GsmNeighbour(arfcn=871, band='dcs1800')]
     conf.intra_freq_neighbours = [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
-    conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
-    conf.device_name = 'auto'
-    conf.device_args = 'serial=33333333'
+    conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500, device_name='auto', device_args='serial=33333333')]
     conf.enb_id = 0x19a
     conf.external_interface = 'new external interface'
     configuration_manager.update_mission(conf)
@@ -127,9 +125,8 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.short_net_name == 'new short'
     assert conf.gsm_neighbours == [GsmNeighbour(arfcn=871, band='dcs1800')]
     assert conf.intra_freq_neighbours == [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
-    assert conf.cells == [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500)]
-    assert conf.device_name == 'auto'
-    assert conf.device_args == 'serial=33333333'
+    assert conf.cells == [EnbCell(),
+                          EnbCell(pci=2, cell_id=2, earfcn=1500, device_name='auto', device_args='serial=33333333')]
     assert conf.enb_id == 0x19a
     assert conf.external_interface == 'new external interface'
 

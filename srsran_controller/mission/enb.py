@@ -1,7 +1,7 @@
 import docker
 
-from srsran_controller.configuration import config
 from srsran_controller.common.docker.entity import Entity
+from srsran_controller.configuration import config
 
 
 class Enb(Entity):
@@ -14,13 +14,14 @@ class Enb(Entity):
     LOG_CONTAINER_PATH = '/tmp/enb.log'
 
     @staticmethod
-    def create(configuration_path: str, sibs_path: str, rbs_path: str, rr_path: str):
+    def create(configuration_path: str, sibs_path: str, rbs_path: str, rr_path: str, enb_index: int):
         """
         Create a SrsENB instance.
         :param configuration_path: SrsENB configuration path.
         :param sibs_path: Sibs configuration path.
         :param rbs_path: RBs configuration path.
         :param rr_path: RR configuration path.
+        :param enb_index: ENB index.
         """
         client = docker.from_env()
         volumes = {
@@ -31,7 +32,7 @@ class Enb(Entity):
         }
         container = client.containers.create(
             config.enb_docker_image, Enb.COMMAND, detach=True, volumes=volumes, auto_remove=True,
-            name=Enb.CONTAINER_NAME, network_mode='none', privileged=True
+            name=Enb.CONTAINER_NAME + str(enb_index), network_mode='none', privileged=True
         )
         enb = Enb(container)
         enb._disconnect('none')

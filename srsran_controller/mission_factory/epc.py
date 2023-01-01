@@ -26,11 +26,10 @@ def create(conf, lte_network, epc_ip: str, pgw_network=None, pgw_ip: str = '') -
     :param pgw_ip: IP inside the P-GW network.
     :return: Launched Epc object.
     """
-    with open(config.current_epc_configuration, 'w') as fd:
-        build_configuration(conf, epc_ip).write(fd)
+    config.current_epc_configuration.write_text(str(build_configuration(conf, epc_ip)))
     epc = Epc.create(config.current_epc_configuration, config.users_db)
     epc.connect(lte_network, epc_ip)
-    if pgw_network:
+    if pgw_network is not None:
         epc.connect(pgw_network, pgw_ip)
     epc.start()
     epc.wait_for_ip()

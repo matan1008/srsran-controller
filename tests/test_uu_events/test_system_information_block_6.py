@@ -59,4 +59,5 @@ def test_parsing_sib6(tmp_path):
             ]
         },
         'time': datetime.datetime(2021, 10, 12, 15, 43, 29, 388623),
+        'enb_ip': '127.0.0.1',
     }

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+from io import StringIO
 from typing import TextIO
 
 import libconf
@@ -85,3 +86,8 @@ class SrsEnbRbs:
             'srb1_5g_config': {'rlc_config': {}},
             'srb2_5g_config': {'rlc_config': {}},
         }, fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()

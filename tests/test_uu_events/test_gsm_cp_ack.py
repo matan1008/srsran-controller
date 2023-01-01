@@ -36,4 +36,5 @@ def test_parsing_gsm_cp_ack(tmp_path):
         'event': GSM_CP_ACK_NAME,
         'rnti': 70,
         'time': datetime.datetime(2022, 3, 28, 8, 6, 46, 832),
+        'enb_ip': '192.168.52.2',
     }

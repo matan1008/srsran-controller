@@ -37,4 +37,5 @@ def test_parsing_sib2(tmp_path):
             'ra_response_window_size': 10,
         },
         'time': datetime.datetime(2021, 10, 12, 15, 43, 26, 478671),
+        'enb_ip': '127.0.0.1',
     }

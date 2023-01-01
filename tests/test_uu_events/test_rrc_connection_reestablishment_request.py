@@ -30,4 +30,5 @@ def test_parsing_connection_reestablishment_request(tmp_path):
         'c-rnti': 70,
         'rnti': 71,
         'time': datetime.datetime(2021, 10, 26, 8, 31, 31, 269910),
+        'enb_ip': '192.168.52.2',
     }

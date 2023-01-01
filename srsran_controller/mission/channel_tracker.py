@@ -18,7 +18,8 @@ class ChannelMetadata:
 
 
 class ChannelTracker:
-    def __init__(self):
+    def __init__(self, pci_to_ip):
+        self.pci_to_ip = pci_to_ip
         self.rnti_channels = {}
         self._events_handlers = {
             ATTACH_ACCEPT_NAME: self._handle_attach_accept,
@@ -40,13 +41,14 @@ class ChannelTracker:
             if channel.imsi == imsi:
                 return channel.ip
 
-    def get_channel(self, rnti: int) -> ChannelMetadata:
+    def get_channel(self, enb_ip: str, rnti: int) -> ChannelMetadata:
         """
         Get channel's metadate.
+        :param enb_ip: IP of enb.
         :param rnti: C-RNTI of the request channel.
         :return: All known metadata about the channel.
         """
-        return self.rnti_channels[rnti]
+        return self.rnti_channels[(enb_ip, rnti)]
 
     def enrich_event(self, event: dict) -> None:
         """
@@ -55,7 +57,7 @@ class ChannelTracker:
         """
         if 'rnti' not in event:
             return
-        channel_metadata = self.rnti_channels[event['rnti']]
+        channel_metadata = self.rnti_channels[event['enb_ip'], event['rnti']]
         if 'ta' not in event:
             event['ta'] = channel_metadata.ta
         if 'imsi' not in event and channel_metadata.imsi:
@@ -75,10 +77,10 @@ class ChannelTracker:
         self._events_handlers[event['event']](event)
 
     def _handle_rar(self, event: dict):
-        self.rnti_channels[event['c-rnti']] = ChannelMetadata(ta=event['ta'])
+        self.rnti_channels[event['enb_ip'], event['c-rnti']] = ChannelMetadata(ta=event['ta'])
 
     def _handle_attach_accept(self, event: dict):
-        self.rnti_channels[event['rnti']].ip = event['ip']
+        self.rnti_channels[event['enb_ip'], event['rnti']].ip = event['ip']
         self._set_imsi(event)
 
     def _handle_attach_request(self, event: dict):
@@ -86,7 +88,7 @@ class ChannelTracker:
 
     def _handle_security_mode_complete(self, event: dict):
         if 'imeisv' in event:
-            self.rnti_channels[event['rnti']].imeisv = event['imeisv']
+            self.rnti_channels[event['enb_ip'], event['rnti']].imeisv = event['imeisv']
 
     def _handle_connection_request(self, event: dict):
         self._set_imsi(event)
@@ -95,19 +97,24 @@ class ChannelTracker:
         self._set_imsi(event)
 
     def _handle_connection_reesttablishment_request(self, event: dict):
-        if event['c-rnti'] not in self.rnti_channels:
+        if event['physical_cell_id'] not in self.pci_to_ip:
             return
-        self.rnti_channels[event['rnti']] = self.rnti_channels.pop(event['c-rnti'])
+        enb_ip = self.pci_to_ip[event['physical_cell_id']]
+        old_channel = (enb_ip, event['c-rnti'])
+        if old_channel not in self.rnti_channels:
+            return
+        self.rnti_channels[event['enb_ip'], event['rnti']] = self.rnti_channels.pop(old_channel)
 
     def _set_imsi(self, event: dict):
         if 'imsi' not in event:
             return
-        self.rnti_channels[event['rnti']].imsi = event['imsi']
+        new_chan = (event['enb_ip'], event['rnti'])
+        self.rnti_channels[new_chan].imsi = event['imsi']
         # Remove old channels related to this imsi.
-        for old_rnti in list(self.rnti_channels.keys()):
-            if self.rnti_channels[old_rnti].imsi == event['imsi'] and old_rnti != event['rnti']:
-                if self.rnti_channels[old_rnti].imeisv and not self.rnti_channels[event['rnti']].imeisv:
-                    self.rnti_channels[event['rnti']].imeisv = self.rnti_channels[old_rnti].imeisv
-                if self.rnti_channels[old_rnti].ip and not self.rnti_channels[event['rnti']].ip:
-                    self.rnti_channels[event['rnti']].ip = self.rnti_channels[old_rnti].ip
-                del self.rnti_channels[old_rnti]
+        for old_chan in list(self.rnti_channels.keys()):
+            if self.rnti_channels[old_chan].imsi == event['imsi'] and old_chan != new_chan:
+                if self.rnti_channels[old_chan].imeisv and not self.rnti_channels[new_chan].imeisv:
+                    self.rnti_channels[new_chan].imeisv = self.rnti_channels[old_chan].imeisv
+                if self.rnti_channels[old_chan].ip and not self.rnti_channels[new_chan].ip:
+                    self.rnti_channels[new_chan].ip = self.rnti_channels[old_chan].ip
+                del self.rnti_channels[old_chan]

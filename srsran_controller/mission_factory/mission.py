@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from ipaddress import IPv4Network
 
 from srsran_controller.common.ip import forward_interfaces
@@ -15,19 +16,25 @@ async def create(configuration):
     Create and start a new mission.
     :param srsran_controller.mission.mission_configuration.MissionConfiguration configuration:
     """
-    epc_ip, enb_ip = map(str, list(IPv4Network(LteNetwork.SUBNET).hosts())[0:2])
+    epc_ip = str(list(IPv4Network(LteNetwork.SUBNET).hosts())[0])
+    enb_ips = [str(ip) for ip in list(IPv4Network(LteNetwork.SUBNET).hosts())[1:len(configuration.cells) + 1]]
+    epc_pgw_ip = str(list(IPv4Network(PgwNetwork.SUBNET).hosts())[0])
+    pgw_interface = configuration.external_interface
 
-    with shutdown_on_error(LteNetwork.create()) as lte_network:
-        external_interface = configuration.external_interface
-        if external_interface.lower() == 'none':
-            with shutdown_on_error(create_epc(configuration, lte_network, epc_ip)) as epc:
-                with shutdown_on_error(create_enb(configuration, lte_network, epc_ip, enb_ip)) as enb:
-                    return Mission(epc, enb, lte_network)
-        else:
-            epc_pgw_ip = str(list(IPv4Network(PgwNetwork.SUBNET).hosts())[0])
-            with shutdown_on_error(PgwNetwork.create()) as pgw_network:
-                with shutdown_on_error(create_epc(configuration, lte_network, epc_ip, pgw_network, epc_pgw_ip)) as epc:
-                    with shutdown_on_error(create_enb(configuration, lte_network, epc_ip, enb_ip)) as enb:
-                        epc.ip_forward(pgw_network)
-                        forward_interfaces(PgwNetwork.INTERFACE_NAME, external_interface, config.sudo_password)
-                        return Mission(epc, enb, lte_network, pgw_network)
+    with ExitStack() as stack:
+        lte_network = stack.enter_context(shutdown_on_error(LteNetwork.create()))
+        pgw_network = (
+            stack.enter_context(shutdown_on_error(PgwNetwork.create())) if pgw_interface.lower() != 'none' else None
+        )
+        epc = stack.enter_context(
+            shutdown_on_error(create_epc(configuration, lte_network, epc_ip, pgw_network, epc_pgw_ip))
+        )
+        enbs = []
+        for i in range(len(configuration.cells)):
+            enbs.append(stack.enter_context(
+                shutdown_on_error(create_enb(configuration, i, lte_network, epc_ip, enb_ips[i]))
+            ))
+        if pgw_interface.lower() != 'none':
+            epc.ip_forward(pgw_network)
+            forward_interfaces(PgwNetwork.INTERFACE_NAME, pgw_interface, config.sudo_password)
+        return Mission(configuration, epc, enbs, lte_network, pgw_network)

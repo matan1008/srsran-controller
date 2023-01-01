@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict, field
+from io import StringIO
 from typing import TextIO
 
 import libconf
@@ -101,7 +102,7 @@ class SrsEnbRRCell:
     dl_earfcn: int
     rf_port: int = 0
     ho_active: bool = False
-    tx_gain: float = 20.0
+    tx_gain: float = 0.0
     scell_list: tuple[SrsEnbRRCellListScell, ...] = field(default_factory=tuple)
     meas_cell_list: tuple[SrsEnbRRCellListMeasCell, ...] = field(default_factory=tuple)
     meas_report_desc: SrsEnbRRCellListMeasReportDesc = field(default_factory=SrsEnbRRCellListMeasReportDesc)
@@ -115,3 +116,8 @@ class SrsEnbRR:
 
     def write(self, fd: TextIO):
         libconf.dump(asdict(self), fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()

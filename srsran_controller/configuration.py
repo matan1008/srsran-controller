@@ -1,5 +1,8 @@
 import json
 from dataclasses import dataclass, fields
+from pathlib import Path
+
+from srsran_controller.common.utils import LazyList
 
 
 @dataclass
@@ -9,12 +12,7 @@ class Configuration:
     """
     missions_configurations_folder: str
     scripts_folder: str
-    current_epc_configuration: str
-    current_enb_configuration: str
-    current_enb_sibs_configuration: str
-    current_enb_rbs_configuration: str
-    current_enb_rr_configuration: str
-    current_ue_configuration: str
+    current_configurations_folder: str
     users_db: str
     scan_results: str
     products_folder: str
@@ -22,6 +20,30 @@ class Configuration:
     enb_docker_image: str = 'srsran-controller-docker:latest'
     scanner_docker_image: str = 'srsran-controller-docker:latest'
     sudo_password: str = ''  # Never save it in a json, required for run time only.
+
+    @property
+    def current_epc_configuration(self) -> Path:
+        return Path(self.current_configurations_folder) / 'epc.conf'
+
+    @property
+    def current_ue_configuration(self) -> Path:
+        return Path(self.current_configurations_folder) / 'ue.conf'
+
+    @property
+    def current_enb_configuration(self) -> list[Path]:
+        return LazyList(lambda i: Path(self.current_configurations_folder) / f'enb{i}.conf')
+
+    @property
+    def current_enb_sibs_configuration(self) -> list[Path]:
+        return LazyList(lambda i: Path(self.current_configurations_folder) / f'enb_sibs{i}.conf')
+
+    @property
+    def current_enb_rbs_configuration(self) -> list[Path]:
+        return LazyList(lambda i: Path(self.current_configurations_folder) / f'enb_rbs{i}.conf')
+
+    @property
+    def current_enb_rr_configuration(self) -> list[Path]:
+        return LazyList(lambda i: Path(self.current_configurations_folder) / f'enb_rr{i}.conf')
 
     def reload(self, path: str):
         """
@@ -39,12 +61,7 @@ class Configuration:
 config = Configuration(
     missions_configurations_folder='',
     scripts_folder='',
-    current_epc_configuration='',
-    current_enb_configuration='',
-    current_enb_sibs_configuration='',
-    current_enb_rbs_configuration='',
-    current_enb_rr_configuration='',
-    current_ue_configuration='',
+    current_configurations_folder='',
     users_db='',
     scan_results='',
     products_folder='',

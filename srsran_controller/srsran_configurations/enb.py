@@ -1,5 +1,6 @@
 import configparser
 from dataclasses import dataclass, asdict, field
+from io import StringIO
 from typing import TextIO
 
 __all__ = [
@@ -96,3 +97,8 @@ class SrsEnbConfiguration:
         config['pcap'] = asdict(self.pcap)
         config['log'] = self.log.to_dict()
         config.write(fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()

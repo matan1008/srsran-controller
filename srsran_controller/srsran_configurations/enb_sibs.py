@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from io import StringIO
 from typing import TextIO
 
 import libconf
@@ -246,3 +247,8 @@ class SrsEnbSibs:
         if 'sib4' in original_dict:
             original_dict['sib4'] = to_dict_without_none(self.sib4)
         libconf.dump(original_dict, fd)
+
+    def __str__(self):
+        data = StringIO()
+        self.write(data)
+        return data.getvalue()

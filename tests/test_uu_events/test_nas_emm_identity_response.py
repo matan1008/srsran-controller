@@ -37,4 +37,5 @@ def test_parsing_emm_identity_response_imsi(tmp_path):
         'event': IDENTITY_RESPONSE_NAME,
         'rnti': 74,
         'time': datetime.datetime(2021, 7, 20, 18, 32, 7, 512094),
+        'enb_ip': '192.168.52.2',
     }

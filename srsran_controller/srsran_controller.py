@@ -24,6 +24,7 @@ class SrsranController:
         config.reload(configuration_path)
         self.configurations = ConfigurationsManager(config.missions_configurations_folder)
         pathlib.Path(config.missions_configurations_folder).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(config.current_configurations_folder).mkdir(parents=True, exist_ok=True)
         self.subscribers = SubscribersManager()
         self.scanner = Scanner()
         self.scripts_executor = ScriptsExecutor()
