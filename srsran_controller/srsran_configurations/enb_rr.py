@@ -102,7 +102,7 @@ class SrsEnbRRCell:
     dl_earfcn: int
     rf_port: int = 0
     ho_active: bool = False
-    tx_gain: float = 20.0
+    tx_gain: float = 0.0
     scell_list: tuple[SrsEnbRRCellListScell, ...] = field(default_factory=tuple)
     meas_cell_list: tuple[SrsEnbRRCellListMeasCell, ...] = field(default_factory=tuple)
     meas_report_desc: SrsEnbRRCellListMeasReportDesc = field(default_factory=SrsEnbRRCellListMeasReportDesc)
