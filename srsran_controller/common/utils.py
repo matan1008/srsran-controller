@@ -24,3 +24,8 @@ class LazyList(list):
 
     def __getitem__(self, item):
         return self.factory(item)
+
+    def __eq__(self, other):
+        if not isinstance(other, LazyList):
+            return False
+        return self.factory == other.factory
