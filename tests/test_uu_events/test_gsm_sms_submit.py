@@ -63,6 +63,7 @@ def test_parsing_gsm_sms_submit(tmp_path):
         },
         'rnti': 74,
         'time': datetime.datetime(2021, 9, 1, 19, 40, 56, 27320),
+        'enb_ip': '192.168.52.2',
     }
 
 
@@ -80,4 +81,5 @@ def test_parsing_gsm_sms_submit_utf16(tmp_path):
         },
         'rnti': 70,
         'time': datetime.datetime(2022, 5, 12, 17, 7, 34, 257301),
+        'enb_ip': '192.168.52.2',
     }

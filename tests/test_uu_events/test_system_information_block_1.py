@@ -39,4 +39,5 @@ def test_parsing_sib1(tmp_path):
             'tac': 19411
         },
         'time': datetime.datetime(2021, 10, 12, 15, 43, 26, 383563),
+        'enb_ip': '127.0.0.1',
     }

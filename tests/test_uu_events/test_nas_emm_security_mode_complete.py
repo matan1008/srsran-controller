@@ -38,4 +38,5 @@ def test_parsing_emm_security_mode_complete_imei(tmp_path):
         'event': SECURITY_MODE_COMPLETE_NAME,
         'rnti': 70,
         'time': datetime.datetime(2021, 7, 22, 15, 1, 15, 904947),
+        'enb_ip': '192.168.52.2',
     }

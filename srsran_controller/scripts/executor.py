@@ -63,4 +63,4 @@ class ScriptsExecutor:
         if mac_layer is None or int(mac_layer.context_tree.get_field('rnti-type')) != CRNTI_TYPE:
             return
         for script in filter(lambda s: not s.stopped, self.scripts):
-            script.handle_new_uu_packet(int(mac_layer.context_tree.rnti), pkt)
+            script.handle_new_uu_packet(str(pkt.ip.src), int(mac_layer.context_tree.rnti), pkt)

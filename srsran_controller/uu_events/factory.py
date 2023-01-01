@@ -55,4 +55,5 @@ class EventsFactory:
                 events = [events]
             for event in events:
                 event['time'] = datetime.fromtimestamp(float(pkt.frame_info.time_epoch))
+                event['enb_ip'] = str(pkt.ip.src)
                 yield event

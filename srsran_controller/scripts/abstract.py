@@ -80,13 +80,14 @@ class AbstractScript(ABC):
         Script's main logic.
         """
 
-    def handle_new_uu_packet(self, rnti: int, packet) -> None:
+    def handle_new_uu_packet(self, enb_ip: str, rnti: int, packet) -> None:
         """
         Handle arrival of a new packet.
+        :param enb_ip: IP of enb.
         :param rnti: C-RNTI of the packet.
         :param packet: Parsed packet object.
         """
-        if self.mission.channel_tracker.get_channel(rnti).imsi != self.imsi:
+        if self.mission.channel_tracker.get_channel(enb_ip, rnti).imsi != self.imsi:
             return
         self.uu_queue.put_nowait(packet)
 

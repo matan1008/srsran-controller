@@ -38,5 +38,6 @@ def test_parsing_gsm_rp_ack(tmp_path):
         'time': datetime.datetime(2022, 3, 28, 8, 6, 46, 20625),
         'data': {
             'message_reference': 1
-        }
+        },
+        'enb_ip': '192.168.52.2',
     }

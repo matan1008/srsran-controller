@@ -41,4 +41,5 @@ def test_parsing_sib3(tmp_path):
             'thresh_serving_low': 4
         },
         'time': datetime.datetime(2021, 10, 12, 15, 43, 26, 478671),
+        'enb_ip': '127.0.0.1',
     }

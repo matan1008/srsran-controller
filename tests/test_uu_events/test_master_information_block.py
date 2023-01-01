@@ -30,5 +30,6 @@ def test_parsing_mib(tmp_path):
             'phich_resource': '1/2',
             'downlink_bandwidth': 75,
         },
-        'time': datetime.datetime(2021, 10, 12, 14, 20, 24, 696270)
+        'time': datetime.datetime(2021, 10, 12, 14, 20, 24, 696270),
+        'enb_ip': '127.0.0.1',
     }

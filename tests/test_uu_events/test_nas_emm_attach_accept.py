@@ -31,4 +31,5 @@ def test_parsing_emm_attach_accept(tmp_path):
         'event': ATTACH_ACCEPT_NAME,
         'rnti': 70,
         'time': datetime.datetime(2021, 8, 20, 17, 16, 35, 111101),
+        'enb_ip': '192.168.52.2',
     }
