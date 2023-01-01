@@ -2,8 +2,8 @@ from srsran_controller.mission.channel_tracker import ChannelTracker, RA_RESPONS
     ATTACH_ACCEPT_NAME, SECURITY_MODE_COMPLETE_NAME, CONNECTION_REESTABLISHMEMT_REQUEST_NAME
 
 
-def track_events(*events):
-    tracker = ChannelTracker()
+def track_events(*events, pci_to_ip=None):
+    tracker = ChannelTracker({} if pci_to_ip is None else pci_to_ip)
     for event in events:
         tracker.handle_uu_event(event)
     return tracker
@@ -113,7 +113,9 @@ def test_handle_reestablishment():
         {'c-rnti': 20, 'enb_ip': '192.168.52.2', 'ta': 3, 'event': RA_RESPONSE_NAME},
         {'rnti': 20, 'enb_ip': '192.168.52.2', 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME},
         {'rnti': 20, 'enb_ip': '192.168.52.2', 'tmsi': 0x53d764bc, 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.4'},
-        {'rnti': 21, 'enb_ip': '192.168.52.2', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20},
+        {'rnti': 21, 'enb_ip': '192.168.52.2', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20,
+         'physical_cell_id': 333},
+        pci_to_ip={333: '192.168.52.2'}
     )
     metadata = tracker.get_channel('192.168.52.2', 21)
     assert metadata.imsi == '001010123456789'
@@ -121,7 +123,35 @@ def test_handle_reestablishment():
     assert metadata.ta == 3
 
 
+def test_handle_reestablishment_different_cell():
+    tracker = track_events(
+        {'c-rnti': 20, 'enb_ip': '192.168.52.2', 'ta': 3, 'event': RA_RESPONSE_NAME},
+        {'rnti': 20, 'enb_ip': '192.168.52.2', 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME},
+        {'rnti': 20, 'enb_ip': '192.168.52.2', 'tmsi': 0x53d764bc, 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.4'},
+        {'rnti': 21, 'enb_ip': '192.168.52.3', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20,
+         'physical_cell_id': 333},
+        pci_to_ip={333: '192.168.52.2'}
+    )
+    metadata = tracker.get_channel('192.168.52.3', 21)
+    assert metadata.imsi == '001010123456789'
+    assert metadata.ip == '172.16.0.4'
+    assert metadata.ta == 3
+
+
+def test_handle_reestablishment_unknown_pci():
+    tracker = track_events(
+        {'c-rnti': 20, 'enb_ip': '192.168.52.2', 'ta': 3, 'event': RA_RESPONSE_NAME},
+        {'rnti': 20, 'enb_ip': '192.168.52.2', 'imsi': '001010123456789', 'event': ATTACH_REQUEST_NAME},
+        {'rnti': 20, 'enb_ip': '192.168.52.2', 'tmsi': 0x53d764bc, 'event': ATTACH_ACCEPT_NAME, 'ip': '172.16.0.4'},
+        {'rnti': 21, 'enb_ip': '192.168.52.2', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20,
+         'physical_cell_id': 222},
+        pci_to_ip={333: '192.168.52.2'}
+    )
+    assert ('192.168.52.2', 21) not in tracker.rnti_channels
+
+
 def test_handle_reestablishment_from_unknown_channel():
     tracker = track_events(
-        {'rnti': 21, 'enb_ip': '192.168.52.2', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20})
+        {'rnti': 21, 'enb_ip': '192.168.52.2', 'event': CONNECTION_REESTABLISHMEMT_REQUEST_NAME, 'c-rnti': 20,
+         'physical_cell_id': 222})
     assert not tracker.rnti_channels

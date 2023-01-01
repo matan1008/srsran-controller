@@ -37,4 +37,4 @@ async def create(configuration):
         if pgw_interface.lower() != 'none':
             epc.ip_forward(pgw_network)
             forward_interfaces(PgwNetwork.INTERFACE_NAME, pgw_interface, config.sudo_password)
-        return Mission(epc, enbs, lte_network, pgw_network)
+        return Mission(configuration, epc, enbs, lte_network, pgw_network)

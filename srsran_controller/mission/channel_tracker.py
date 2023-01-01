@@ -18,7 +18,8 @@ class ChannelMetadata:
 
 
 class ChannelTracker:
-    def __init__(self):
+    def __init__(self, pci_to_ip):
+        self.pci_to_ip = pci_to_ip
         self.rnti_channels = {}
         self._events_handlers = {
             ATTACH_ACCEPT_NAME: self._handle_attach_accept,
@@ -96,8 +97,10 @@ class ChannelTracker:
         self._set_imsi(event)
 
     def _handle_connection_reesttablishment_request(self, event: dict):
-        # Todo: Better check for source enb
-        old_channel = (event['enb_ip'], event['c-rnti'])
+        if event['physical_cell_id'] not in self.pci_to_ip:
+            return
+        enb_ip = self.pci_to_ip[event['physical_cell_id']]
+        old_channel = (enb_ip, event['c-rnti'])
         if old_channel not in self.rnti_channels:
             return
         self.rnti_channels[event['enb_ip'], event['rnti']] = self.rnti_channels.pop(old_channel)
