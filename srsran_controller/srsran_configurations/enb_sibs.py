@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from io import StringIO
 from typing import TextIO
 
@@ -13,6 +13,10 @@ __all__ = [
     'SrsEnbSib2UeTimersAndConstants', 'SrsEnbSib2FreqInfo', 'SrsEnbSib2', 'SrsEnbSib3CellReselectionCommon',
     'SrsEnbSib3CellReselectionServing', 'SrsEnbSib3IntraFreqReselection', 'SrsEnbSib3', 'SrsEnbSib7CarrierFreqsInfo',
     'SrsEnbSib7', 'SrsEnbSibs', 'SrsEnbSib4IntraFreqNeighCellInfo', 'SrsEnbSib4', 'SrsEnbPhysCellIdRange',
+    'SrsEnbSib17WlanOffloadCfgThresRsrp', 'SrsEnbSib17WlanOffloadCfgThresRsrq',
+    'SrsEnbSib17WlanOffloadCfgThresChUtilization', 'SrsEnbSib17WlanOffloadCfgThresBackhaulBw',
+    'SrsEnbSib17WlanOffloadCfgThresWlanRssi', 'SrsEnbSib17WlanOffloadCfg', 'SrsEnbSib17WlanId',
+    'SrsEnbSib17InfoPerPlmn', 'SrsEnbSib17',
 ]
 
 
@@ -235,17 +239,94 @@ class SrsEnbSib7:
 
 
 @dataclass
+class SrsEnbSib17WlanOffloadCfgThresRsrp:
+    thres_rsrp_low: int = 97
+    thres_rsrp_high: int = 97
+
+
+@dataclass
+class SrsEnbSib17WlanOffloadCfgThresRsrq:
+    thres_rsrq_low: int = 34
+    thres_rsrq_high: int = 34
+
+
+@dataclass
+class SrsEnbSib17WlanOffloadCfgThresChUtilization:
+    thres_ch_utilization_low: int = 255
+    thres_ch_utilization_high: int = 255
+
+
+@dataclass
+class SrsEnbSib17WlanOffloadCfgThresBackhaulBw:
+    thres_backhaul_dl_bw_low: int = 0
+    thres_backhaul_dl_bw_high: int = 0
+    thres_backhaul_ul_bw_low: int = 0
+    thres_backhaul_ul_bw_high: int = 0
+
+
+@dataclass
+class SrsEnbSib17WlanOffloadCfgThresWlanRssi:
+    thres_wlan_rssi_low: int = 0
+    thres_wlan_rssi_high: int = 0
+
+
+@dataclass
+class SrsEnbSib17WlanOffloadCfg:
+    thres_rsrp: SrsEnbSib17WlanOffloadCfgThresRsrp = field(default_factory=SrsEnbSib17WlanOffloadCfgThresRsrp)
+    thres_rsrq: SrsEnbSib17WlanOffloadCfgThresRsrq = field(default_factory=SrsEnbSib17WlanOffloadCfgThresRsrq)
+    thres_ch_utilization: SrsEnbSib17WlanOffloadCfgThresChUtilization = field(
+        default_factory=SrsEnbSib17WlanOffloadCfgThresChUtilization)
+    thres_backhaul_bw: SrsEnbSib17WlanOffloadCfgThresBackhaulBw = field(
+        default_factory=SrsEnbSib17WlanOffloadCfgThresBackhaulBw)
+    thres_wlan_rssi: SrsEnbSib17WlanOffloadCfgThresWlanRssi = field(
+        default_factory=SrsEnbSib17WlanOffloadCfgThresWlanRssi)
+    t_steering_wlan: int = 1
+
+
+@dataclass
+class SrsEnbSib17WlanId:
+    ssid: str = None
+    bssid: str = None
+    hessid: str = None
+
+
+@dataclass
+class SrsEnbSib17InfoPerPlmn:
+    wlan_offload_cfg_common: SrsEnbSib17WlanOffloadCfg = field(default_factory=SrsEnbSib17WlanOffloadCfg)
+    wlan_id_list: tuple[SrsEnbSib17WlanId, ...] = field(default_factory=tuple)
+
+    def to_dict(self):
+        return {
+            'wlan_offload_cfg_common': asdict(self.wlan_offload_cfg_common),
+            'wlan_id_list': tuple(to_dict_without_none(id_) for id_ in self.wlan_id_list)
+        }
+
+
+@dataclass
+class SrsEnbSib17:
+    wlan_offload_info_per_plmn_list: tuple[SrsEnbSib17InfoPerPlmn, ...] = field(default_factory=tuple)
+
+    def to_dict(self):
+        return {
+            'wlan_offload_info_per_plmn_list': tuple(info.to_dict() for info in self.wlan_offload_info_per_plmn_list)
+        }
+
+
+@dataclass
 class SrsEnbSibs:
     sib1: SrsEnbSib1 = field(default_factory=SrsEnbSib1)
     sib2: SrsEnbSib2 = field(default_factory=SrsEnbSib2)
     sib3: SrsEnbSib3 = field(default_factory=SrsEnbSib3)
     sib4: SrsEnbSib4 = None
     sib7: SrsEnbSib7 = None
+    sib17: SrsEnbSib17 = None
 
     def write(self, fd: TextIO):
         original_dict = to_dict_without_none(self)
         if 'sib4' in original_dict:
             original_dict['sib4'] = to_dict_without_none(self.sib4)
+        if 'sib17' in original_dict:
+            original_dict['sib17'] = self.sib17.to_dict()
         libconf.dump(original_dict, fd)
 
     def __str__(self):
