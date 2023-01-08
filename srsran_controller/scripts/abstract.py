@@ -87,7 +87,11 @@ class AbstractScript(ABC):
         :param rnti: C-RNTI of the packet.
         :param packet: Parsed packet object.
         """
-        if self.mission.channel_tracker.get_channel(enb_ip, rnti).imsi != self.imsi:
+        try:
+            if self.mission.channel_tracker.get_channel(enb_ip, rnti).imsi != self.imsi:
+                return
+        except KeyError:
+            self._logger.error(f'Script {self.id} failed to find channel ({enb_ip}, {rnti})')
             return
         self.uu_queue.put_nowait(packet)
 
