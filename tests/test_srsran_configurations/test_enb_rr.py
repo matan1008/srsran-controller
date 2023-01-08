@@ -23,9 +23,10 @@ def test_sanity():
         cell_list=(SrsEnbRRCell(
             cell_id=0x01, tac=0x0007, pci=1, dl_earfcn=3350, ho_active=False, scell_list=(),
             meas_cell_list=(SrsEnbRRCellListMeasCell(eci=0x19C02, dl_earfcn=2850, pci=2),),
-            meas_report_desc=SrsEnbRRCellListMeasReportDesc(
-                a3_report_type='RSRP', a3_offset=6, a3_hysteresis=0, a3_time_to_trigger=480, rsrq_config=4
-            )
+            meas_report_desc=(SrsEnbRRCellListMeasReportDesc(
+                eventA=3, trigger_quant='RSRP', a3_offset=6, hysteresis=0, time_to_trigger=480
+            ),),
+            meas_quant_desc=SrsEnbRRCellListMeasQuantDesc()
         ),)
     ).write(output)
     assert output.getvalue() == (
@@ -83,6 +84,8 @@ def test_sanity():
         '        rf_port = 0;\n'
         '        ho_active = False;\n'
         '        tx_gain = 0.0;\n'
+        '        meas_gap_period = 40;\n'
+        '        meas_gap_offset_subframe = 6;\n'
         '        scell_list =\n'
         '        (\n'
         '\n'
@@ -96,12 +99,22 @@ def test_sanity():
         '            }\n'
         '        );\n'
         '        meas_report_desc =\n'
+        '        (\n'
+        '            {\n'
+        '                eventA = 3;\n'
+        '                trigger_quant = "RSRP";\n'
+        '                a3_offset = 6;\n'
+        '                hysteresis = 0;\n'
+        '                time_to_trigger = 480;\n'
+        '                max_report_cells = 1;\n'
+        '                report_interv = 120;\n'
+        '                report_amount = 4;\n'
+        '            }\n'
+        '        );\n'
+        '        meas_quant_desc =\n'
         '        {\n'
-        '            a3_report_type = "RSRP";\n'
-        '            a3_offset = 6;\n'
-        '            a3_hysteresis = 0;\n'
-        '            a3_time_to_trigger = 480;\n'
-        '            rsrq_config = 4;\n'
+        '            rsrq_config = 0;\n'
+        '            rsrp_config = 0;\n'
         '        };\n'
         '    }\n'
         ');\n'
@@ -128,14 +141,12 @@ def test_multi_cell():
         cell_list=(
             SrsEnbRRCell(
                 cell_id=0x01, tac=0x0007, pci=1, dl_earfcn=3350, ho_active=False, scell_list=(),
-                meas_cell_list=(SrsEnbRRCellListMeasCell(eci=0x19C02, dl_earfcn=2850, pci=2),),
-                meas_report_desc=SrsEnbRRCellListMeasReportDesc(
-                    a3_report_type='RSRP', a3_offset=6, a3_hysteresis=0, a3_time_to_trigger=480, rsrq_config=4
-                )
             ),
             SrsEnbRRCell(
-                cell_id=0x02, tac=0x0007, pci=2, dl_earfcn=1600, ho_active=False, scell_list=(), rf_port=1,
-                meas_cell_list=(SrsEnbRRCellListMeasCell(eci=0x19C01, dl_earfcn=3350, pci=1),)
+                cell_id=0x02, tac=0x0007, pci=2, dl_earfcn=1600, ho_active=True, scell_list=(), rf_port=1,
+                meas_cell_list=(SrsEnbRRCellListMeasCell(eci=0x19C01, dl_earfcn=3350, pci=1),),
+                meas_report_desc=SrsEnbRRCellListMeasReportDesc(),
+                meas_quant_desc=SrsEnbRRCellListMeasQuantDesc()
             ),
         )
     ).write(output)
@@ -194,25 +205,24 @@ def test_multi_cell():
         '        rf_port = 0;\n'
         '        ho_active = False;\n'
         '        tx_gain = 0.0;\n'
+        '        meas_gap_period = 40;\n'
+        '        meas_gap_offset_subframe = 6;\n'
         '        scell_list =\n'
         '        (\n'
         '\n'
         '        );\n'
         '        meas_cell_list =\n'
         '        (\n'
-        '            {\n'
-        '                eci = 105474;\n'
-        '                dl_earfcn = 2850;\n'
-        '                pci = 2;\n'
-        '            }\n'
+        '\n'
         '        );\n'
         '        meas_report_desc =\n'
+        '        (\n'
+        '\n'
+        '        );\n'
+        '        meas_quant_desc =\n'
         '        {\n'
-        '            a3_report_type = "RSRP";\n'
-        '            a3_offset = 6;\n'
-        '            a3_hysteresis = 0;\n'
-        '            a3_time_to_trigger = 480;\n'
-        '            rsrq_config = 4;\n'
+        '            rsrq_config = 0;\n'
+        '            rsrp_config = 0;\n'
         '        };\n'
         '    },\n'
         '    {\n'
@@ -221,8 +231,10 @@ def test_multi_cell():
         '        pci = 2;\n'
         '        dl_earfcn = 1600;\n'
         '        rf_port = 1;\n'
-        '        ho_active = False;\n'
+        '        ho_active = True;\n'
         '        tx_gain = 0.0;\n'
+        '        meas_gap_period = 40;\n'
+        '        meas_gap_offset_subframe = 6;\n'
         '        scell_list =\n'
         '        (\n'
         '\n'
@@ -237,11 +249,19 @@ def test_multi_cell():
         '        );\n'
         '        meas_report_desc =\n'
         '        {\n'
-        '            a3_report_type = "RSRP";\n'
+        '            eventA = 3;\n'
+        '            trigger_quant = "RSRP";\n'
         '            a3_offset = 6;\n'
-        '            a3_hysteresis = 0;\n'
-        '            a3_time_to_trigger = 480;\n'
-        '            rsrq_config = 4;\n'
+        '            hysteresis = 0;\n'
+        '            time_to_trigger = 480;\n'
+        '            max_report_cells = 1;\n'
+        '            report_interv = 120;\n'
+        '            report_amount = 4;\n'
+        '        };\n'
+        '        meas_quant_desc =\n'
+        '        {\n'
+        '            rsrq_config = 0;\n'
+        '            rsrp_config = 0;\n'
         '        };\n'
         '    }\n'
         ');\n'

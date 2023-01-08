@@ -62,15 +62,16 @@ def build_rr(conf, enb_index):
     :param enb_index: Index of current enb.
     """
     cell = conf.cells[enb_index]
-    return SrsEnbRR(
-        cell_list=(SrsEnbRRCell(
-            cell_id=cell.cell_id, tac=conf.tac, pci=cell.pci, dl_earfcn=cell.earfcn,
-            meas_cell_list=(
-                SrsEnbRRCellListMeasCell(eci=(256 * conf.enb_id) + cell.cell_id, dl_earfcn=cell.earfcn, pci=cell.pci, ),
-            ),
-            meas_report_desc=SrsEnbRRCellListMeasReportDesc()
-        ),)
-    )
+    conf_cell = SrsEnbRRCell(cell_id=cell.cell_id, tac=conf.tac, pci=cell.pci, dl_earfcn=cell.earfcn)
+    if enb_index == 0 and len(conf.cells) > 1:
+        ho_cell = conf.cells[1]
+        conf_cell.ho_active = True
+        conf_cell.meas_cell_list = (
+            SrsEnbRRCellListMeasCell(eci=(256 * conf.enb_id) + ho_cell.cell_id, dl_earfcn=ho_cell.earfcn,
+                                     pci=ho_cell.pci),)
+        conf_cell.meas_report_desc = (SrsEnbRRCellListMeasReportDesc(),)
+        conf_cell.meas_quant_desc = SrsEnbRRCellListMeasQuantDesc()
+    return SrsEnbRR(cell_list=(conf_cell,))
 
 
 def build_rf_configuration(conf):

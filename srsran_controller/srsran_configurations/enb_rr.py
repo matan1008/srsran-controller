@@ -7,7 +7,8 @@ import libconf
 __all__ = [
     'SrsEnbRRMacConfigPhr', 'SrsEnbRRMacConfigUlsch', 'SrsEnbRRMacConfig', 'SrsEnbRRPhyConfigPhich',
     'SrsEnbRRPhyConfigPuschDed', 'SrsEnbRRPhyConfigSchedRequest', 'SrsEnbRRPhyConfigCqiReport', 'SrsEnbRRPhyConfig',
-    'SrsEnbRRCellListScell', 'SrsEnbRRCellListMeasCell', 'SrsEnbRRCellListMeasReportDesc', 'SrsEnbRRCell', 'SrsEnbRR'
+    'SrsEnbRRCellListScell', 'SrsEnbRRCellListMeasCell', 'SrsEnbRRCellListMeasReportDesc', 'SrsEnbRRCell', 'SrsEnbRR',
+    'SrsEnbRRCellListMeasQuantDesc',
 ]
 
 
@@ -87,11 +88,20 @@ class SrsEnbRRCellListMeasCell:
 
 @dataclass
 class SrsEnbRRCellListMeasReportDesc:
-    a3_report_type: str = 'RSRP'
+    eventA: int = 3
+    trigger_quant: str = 'RSRP'
     a3_offset: int = 6
-    a3_hysteresis: int = 0
-    a3_time_to_trigger: int = 480  # In ms.
-    rsrq_config: int = 4
+    hysteresis: int = 0
+    time_to_trigger: int = 480  # In ms.
+    max_report_cells: int = 1
+    report_interv: int = 120  # In ms.
+    report_amount: int = 4
+
+
+@dataclass
+class SrsEnbRRCellListMeasQuantDesc:
+    rsrq_config: int = 0
+    rsrp_config: int = 0
 
 
 @dataclass
@@ -103,9 +113,12 @@ class SrsEnbRRCell:
     rf_port: int = 0
     ho_active: bool = False
     tx_gain: float = 0.0
+    meas_gap_period: int = 40
+    meas_gap_offset_subframe: int = 6
     scell_list: tuple[SrsEnbRRCellListScell, ...] = field(default_factory=tuple)
     meas_cell_list: tuple[SrsEnbRRCellListMeasCell, ...] = field(default_factory=tuple)
-    meas_report_desc: SrsEnbRRCellListMeasReportDesc = field(default_factory=SrsEnbRRCellListMeasReportDesc)
+    meas_report_desc: tuple[SrsEnbRRCellListMeasReportDesc, ...] = field(default_factory=tuple)
+    meas_quant_desc: SrsEnbRRCellListMeasQuantDesc = field(default_factory=SrsEnbRRCellListMeasQuantDesc)
 
 
 @dataclass
