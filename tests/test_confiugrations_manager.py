@@ -7,7 +7,7 @@ import pytest
 from srsran_controller.configurations_manager import ConfigurationsManager
 from srsran_controller.exceptions import MissionIdNotFoundError
 from srsran_controller.mission.mission_configuration import MissionConfiguration, GsmNeighbour, EnbCell, \
-    IntraFreqNeighbour
+    IntraFreqNeighbour, WlanAssisted
 
 
 def test_create_mission(tmpdir):
@@ -108,6 +108,7 @@ def test_updating_all_configuration_values(tmpdir):
     conf.short_net_name = 'new short'
     conf.gsm_neighbours = [GsmNeighbour(arfcn=871, band='dcs1800')]
     conf.intra_freq_neighbours = [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
+    conf.wlan_assisted = [WlanAssisted(ssid='yooooo')]
     conf.cells = [EnbCell(), EnbCell(pci=2, cell_id=2, earfcn=1500, device_name='auto', device_args='serial=33333333')]
     conf.enb_id = 0x19a
     conf.external_interface = 'new external interface'
@@ -125,6 +126,7 @@ def test_updating_all_configuration_values(tmpdir):
     assert conf.short_net_name == 'new short'
     assert conf.gsm_neighbours == [GsmNeighbour(arfcn=871, band='dcs1800')]
     assert conf.intra_freq_neighbours == [IntraFreqNeighbour(phys_cell_id=10, q_offset_cell=5)]
+    assert conf.wlan_assisted == [WlanAssisted(ssid='yooooo')]
     assert conf.cells == [EnbCell(),
                           EnbCell(pci=2, cell_id=2, earfcn=1500, device_name='auto', device_args='serial=33333333')]
     assert conf.enb_id == 0x19a

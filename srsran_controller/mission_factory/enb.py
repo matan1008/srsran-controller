@@ -11,6 +11,7 @@ def build_sibs(conf):
     scheduled_sibs = [3]
     sib4 = None
     sib7 = None
+    sib17 = None
     if conf.intra_freq_neighbours:
         intra_freq_neighs = tuple(
             SrsEnbSib4IntraFreqNeighCellInfo(n.phys_cell_id, n.q_offset_cell) for n in conf.intra_freq_neighbours
@@ -24,8 +25,13 @@ def build_sibs(conf):
         )
         sib7 = SrsEnbSib7(carrier_freqs_info_list=gsm_neighbours)
         scheduled_sibs.append(7)
+    if conf.wlan_assisted:
+        sib17 = SrsEnbSib17(wlan_offload_info_per_plmn_list=(SrsEnbSib17InfoPerPlmn(wlan_id_list=tuple(
+            SrsEnbSib17WlanId(ssid=w.ssid, bssid=w.bssid) for w in conf.wlan_assisted
+        )),))
+        scheduled_sibs.append(17)
     sib1 = SrsEnbSib1(sched_info=(SrsEnbSib1SchedulerInfo(si_periodicity=16, si_mapping_info=scheduled_sibs),))
-    return SrsEnbSibs(sib1=sib1, sib4=sib4, sib7=sib7)
+    return SrsEnbSibs(sib1=sib1, sib4=sib4, sib7=sib7, sib17=sib17)
 
 
 def build_rbs():

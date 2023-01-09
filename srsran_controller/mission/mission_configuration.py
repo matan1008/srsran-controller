@@ -25,10 +25,17 @@ class GsmNeighbour:
 
 
 @dataclass
+class WlanAssisted:
+    ssid: str = None
+    bssid: str = None
+
+
+@dataclass
 class MissionConfiguration:
     id: str = field(default_factory=lambda: str(uuid4()))
     intra_freq_neighbours: list[IntraFreqNeighbour] = field(default_factory=list)
     gsm_neighbours: list[GsmNeighbour] = field(default_factory=list)
+    wlan_assisted: list[WlanAssisted] = field(default_factory=list)
     cells: list[EnbCell] = field(default_factory=lambda: [EnbCell()])
     name: str = 'New mission'
     mcc: str = '001'
@@ -46,5 +53,6 @@ class MissionConfiguration:
     def from_dict(data: dict):
         data['intra_freq_neighbours'] = [IntraFreqNeighbour(**neigh) for neigh in data.get('intra_freq_neighbours', [])]
         data['gsm_neighbours'] = [GsmNeighbour(**neigh) for neigh in data.get('gsm_neighbours', [])]
+        data['wlan_assisted'] = [WlanAssisted(**wlan) for wlan in data.get('wlan_assisted', [])]
         data['cells'] = [EnbCell(**cell_data) for cell_data in data.get('cells', [])]
         return MissionConfiguration(**data)
