@@ -131,6 +131,10 @@ class SrsranController:
             raise exceptions.MissionIsNotRunningError()
 
     def _handle_uu_event(self, event):
+        if event.get('imsi', ''):
+            subscriber = self.subscribers.get_by_imsi(event['imsi'])
+            if subscriber is not None:
+                event['name'] = subscriber.name
         self.products.write_event(event)
         self.events_subject.notify(event)
 
