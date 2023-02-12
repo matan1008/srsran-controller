@@ -1,3 +1,4 @@
+import dataclasses
 from contextlib import contextmanager
 
 import pytest
@@ -99,3 +100,40 @@ def test_iterating_subscribers_missing_file():
     with change_users_db('users_db_that_doesnt_exist'):
         s = SubscribersManager()
         assert not list(s.iter_subscribers())
+
+
+def test_getting_subscriber():
+    s = SubscribersManager()
+    sub = s.get_by_imsi('001010123456785')
+    assert sub is None
+
+
+def test_getting_subscriber_after_create():
+    s = SubscribersManager()
+    sub = s.get_by_imsi('001010123456785')
+    assert sub is None
+    sub = s.create_subscriber('Name', '001010123456785', '00112233445566778899aabbccddeeff', 'opc',
+                              '63bfa50ee6523365ff14c1f45f88737d', '9001', 1233, 9, 'dynamic')
+    sub1 = s.get_by_imsi('001010123456785')
+    assert sub == sub1
+
+
+def test_getting_subscriber_after_edit():
+    s = SubscribersManager()
+    s.create_subscriber('Name', '001010123456785', '00112233445566778899aabbccddeeff', 'opc',
+                        '63bfa50ee6523365ff14c1f45f88737d', '9001', 1233, 9, 'dynamic')
+    sub = s.get_by_imsi('001010123456785')
+    sub = dataclasses.replace(sub, name='New Name!')
+    s.edit_subscriber(sub)
+    sub1 = s.get_by_imsi('001010123456785')
+    assert sub == sub1
+
+
+def test_getting_subscriber_after_delete():
+    s = SubscribersManager()
+    s.create_subscriber('Name', '001010123456785', '00112233445566778899aabbccddeeff', 'opc',
+                        '63bfa50ee6523365ff14c1f45f88737d', '9001', 1233, 9, 'dynamic')
+    sub = s.get_by_imsi('001010123456785')
+    s.delete_subscriber(sub)
+    sub1 = s.get_by_imsi('001010123456785')
+    assert sub1 is None

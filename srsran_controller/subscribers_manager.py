@@ -1,5 +1,6 @@
 import csv
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 
 from srsran_controller.configuration import config
@@ -25,6 +26,7 @@ class SubscribersManager:
         with open(config.users_db, 'a') as subscribers_file:
             writer = csv.writer(subscribers_file, lineterminator='\n')
             writer.writerow([name, auth, imsi, key, op_type, op, amf, f'{sqn:012x}', qci, ip])
+        self.get_by_imsi.cache_clear()
         return list(self.iter_subscribers())[-1]
 
     def edit_subscriber(self, subscriber: Subscriber):
@@ -39,6 +41,7 @@ class SubscribersManager:
                     ])
                 else:
                     writer.writerow(row)
+        self.get_by_imsi.cache_clear()
 
     def delete_subscriber(self, subscriber: Subscriber):
         lines = list(self._iter_db_lines())
@@ -49,12 +52,19 @@ class SubscribersManager:
                     continue
                 else:
                     writer.writerow(row)
+        self.get_by_imsi.cache_clear()
 
     def iter_subscribers(self):
         for i, row in enumerate(self._iter_db_lines()):
             # The row is in the following format: Name,Auth,IMSI,Key,OP_Type,OP/OPc,AMF,SQN,QCI,IP_alloc
             yield Subscriber(i, row[0], row[2], row[3], row[4], row[5], row[6], int(row[7], 16), int(row[8]), row[9],
                              row[1])
+
+    @cache
+    def get_by_imsi(self, imsi: str) -> Subscriber:
+        for subscriber in self.iter_subscribers():
+            if subscriber.imsi == imsi:
+                return subscriber
 
     @staticmethod
     def _iter_db_lines():
